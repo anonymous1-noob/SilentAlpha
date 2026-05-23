@@ -5,6 +5,7 @@ import '../services/supabase_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/avatar_utils.dart';
 import '../utils/time_utils.dart';
+import 'profile/profile_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -120,38 +121,60 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         child: Column(
                           children: [
                             ListTile(
-                              leading: Stack(
-                                children: [
-                                  AvatarUtils.buildAvatar(
-                                    url: n.actorAvatarUrl,
-                                    userId: n.actorHandle,
-                                    username: n.actorHandle,
-                                    radius: 22,
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      width: 18,
-                                      height: 18,
-                                      decoration: BoxDecoration(
-                                        color: n.iconColor,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(n.icon,
-                                          size: 10, color: Colors.white),
+                              leading: GestureDetector(
+                                onTap: n.actorId != null
+                                    ? () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => ProfileScreen(
+                                                userId: n.actorId!),
+                                          ),
+                                        )
+                                    : null,
+                                child: Stack(
+                                  children: [
+                                    AvatarUtils.buildAvatar(
+                                      url: n.actorAvatarUrl,
+                                      userId: n.actorHandle,
+                                      username: n.actorHandle,
+                                      radius: 22,
                                     ),
-                                  ),
-                                ],
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        width: 18,
+                                        height: 18,
+                                        decoration: BoxDecoration(
+                                          color: n.iconColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(n.icon,
+                                            size: 10, color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              title: Text(
-                                n.label,
-                                style: TextStyle(
-                                  color: AppTheme.of(context).onSurface,
-                                  fontWeight: n.read
-                                      ? FontWeight.normal
-                                      : FontWeight.w600,
-                                  fontSize: 14,
+                              title: GestureDetector(
+                                onTap: n.actorId != null
+                                    ? () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => ProfileScreen(
+                                                userId: n.actorId!),
+                                          ),
+                                        )
+                                    : null,
+                                child: Text(
+                                  n.label,
+                                  style: TextStyle(
+                                    color: AppTheme.of(context).onSurface,
+                                    fontWeight: n.read
+                                        ? FontWeight.normal
+                                        : FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
                               subtitle: Text(
