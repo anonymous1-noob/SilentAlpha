@@ -69,10 +69,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 FadeInDown(
                   delay: const Duration(milliseconds: 100),
-                  child: const Text(
+                  child: Text(
                     'Speak freely. Stay anonymous.',
                     style: TextStyle(
-                      color: AppTheme.onSurfaceMuted,
+                      color: AppTheme.of(context).onSurfaceMuted,
                       fontSize: 16,
                     ),
                   ),
@@ -83,10 +83,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextFormField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Email',
                       prefixIcon: Icon(Icons.email_outlined,
-                          color: AppTheme.onSurfaceMuted),
+                          color: AppTheme.of(context).onSurfaceMuted),
                     ),
                     validator: (v) =>
                         v != null && v.contains('@') ? null : 'Enter a valid email',
@@ -100,14 +100,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: _obscure,
                     decoration: InputDecoration(
                       hintText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outline,
-                          color: AppTheme.onSurfaceMuted),
+                      prefixIcon: Icon(Icons.lock_outline,
+                          color: AppTheme.of(context).onSurfaceMuted),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscure
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
-                          color: AppTheme.onSurfaceMuted,
+                          color: AppTheme.of(context).onSurfaceMuted,
                         ),
                         onPressed: () =>
                             setState(() => _obscure = !_obscure),
@@ -137,9 +137,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             builder: (_) => const RegisterScreen()),
                       ),
                       child: RichText(
-                        text: const TextSpan(
+                        text: TextSpan(
                           text: "Don't have an account? ",
-                          style: TextStyle(color: AppTheme.onSurfaceMuted),
+                          style: TextStyle(color: AppTheme.of(context).onSurfaceMuted),
                           children: [
                             TextSpan(
                               text: 'Sign Up',

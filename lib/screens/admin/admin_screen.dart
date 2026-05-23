@@ -260,7 +260,7 @@ class _CategoriesTabState extends State<_CategoriesTab> {
                   title: Text(cat['name'] as String,
                       style: const TextStyle(fontWeight: FontWeight.w600)),
                   subtitle: Text('${(cat['post_count'] ?? 0)} posts',
-                      style: const TextStyle(color: AppTheme.onSurfaceMuted, fontSize: 12)),
+                      style: TextStyle(color: AppTheme.of(context).onSurfaceMuted, fontSize: 12)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

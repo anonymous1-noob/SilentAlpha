@@ -62,9 +62,9 @@ class _PollWidgetState extends State<PollWidget> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceVariant,
+        color: AppTheme.of(context).surfaceVariant,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF1A2545)),
+        border: Border.all(color: AppTheme.of(context).border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,11 +125,11 @@ class _PollWidgetState extends State<PollWidget> {
             children: [
               Text(
                 '${_poll.totalVotes} vote${_poll.totalVotes == 1 ? '' : 's'}',
-                style: const TextStyle(fontSize: 12, color: AppTheme.onSurfaceMuted),
+                style: TextStyle(fontSize: 12, color: AppTheme.of(context).onSurfaceMuted),
               ),
               if (_poll.deadline != null) ...[
                 const SizedBox(width: 8),
-                const Text('·', style: TextStyle(color: AppTheme.onSurfaceMuted)),
+                Text('·', style: TextStyle(color: AppTheme.of(context).onSurfaceMuted)),
                 const SizedBox(width: 8),
                 Text(
                   _poll.isExpired
@@ -185,7 +185,7 @@ class _ResultBar extends StatelessWidget {
               border: Border.all(
                 color: isMyVote
                     ? AppTheme.primary.withValues(alpha: 0.5)
-                    : const Color(0xFF1A2545),
+                    : AppTheme.of(context).border,
               ),
             ),
           ),

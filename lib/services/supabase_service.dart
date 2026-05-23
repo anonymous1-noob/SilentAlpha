@@ -228,7 +228,7 @@ class SupabaseService {
       });
 
   static Future<void> approveFollowRequest(String requesterId) async {
-    await client.from('follows').upsert({
+    await client.from('follows').insert({
       'follower_id': requesterId,
       'following_id': currentUserId!,
       'created_at': DateTime.now().toUtc().toIso8601String(),

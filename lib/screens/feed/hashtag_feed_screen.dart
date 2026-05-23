@@ -56,11 +56,11 @@ class _HashtagFeedScreenState extends State<HashtagFeedScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.tag, size: 64, color: AppTheme.onSurfaceMuted),
+                        Icon(Icons.tag, size: 64, color: AppTheme.of(context).onSurfaceMuted),
                         const SizedBox(height: 16),
                         Text(
                           'No posts tagged #${widget.hashtag}',
-                          style: const TextStyle(color: AppTheme.onSurfaceMuted),
+                          style: TextStyle(color: AppTheme.of(context).onSurfaceMuted),
                         ),
                       ],
                     ),

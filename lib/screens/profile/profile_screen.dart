@@ -207,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           ]
           else
             PopupMenuButton<String>(
-              color: AppTheme.surfaceVariant,
+              color: AppTheme.of(context).surfaceVariant,
               onSelected: (v) async {
                 if (v == 'block') {
                   await SupabaseService.blockUser(widget.userId);
@@ -317,8 +317,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         const SizedBox(height: 2),
                         Text(
                           _profile!.tagline!,
-                          style: const TextStyle(
-                            color: AppTheme.onSurfaceMuted,
+                          style: TextStyle(
+                            color: AppTheme.of(context).onSurfaceMuted,
                             fontSize: 13,
                             fontStyle: FontStyle.italic,
                           ),
@@ -341,7 +341,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       const SizedBox(height: 4),
                       Text(
                         'Joined ${TimeUtils.formatFull(_profile?.createdAt ?? DateTime.now())}',
-                        style: const TextStyle(color: AppTheme.onSurfaceMuted, fontSize: 11),
+                        style: TextStyle(color: AppTheme.of(context).onSurfaceMuted, fontSize: 11),
                       ),
                     ],
                   ),
@@ -356,7 +356,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               const SizedBox(height: 12),
               Text(
                 _profile!.bio!,
-                style: const TextStyle(color: AppTheme.onSurface, height: 1.4),
+                style: TextStyle(color: AppTheme.of(context).onSurface, height: 1.4),
               ),
             ],
             const SizedBox(height: 16),
@@ -485,7 +485,7 @@ class _Stat extends StatelessWidget {
         ),
         Text(
           label,
-          style: const TextStyle(color: AppTheme.onSurfaceMuted, fontSize: 12),
+          style: TextStyle(color: AppTheme.of(context).onSurfaceMuted, fontSize: 12),
         ),
       ],
     );
@@ -499,8 +499,8 @@ class _PostsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (posts.isEmpty) {
-      return const Center(
-        child: Text('No posts yet', style: TextStyle(color: AppTheme.onSurfaceMuted)),
+      return Center(
+        child: Text('No posts yet', style: TextStyle(color: AppTheme.of(context).onSurfaceMuted)),
       );
     }
     return ListView.builder(

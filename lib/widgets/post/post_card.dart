@@ -92,14 +92,14 @@ class _PostCardState extends State<PostCard> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: AppTheme.cardBg,
+          color: AppTheme.of(context).cardBg,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: widget.post.isPinned
                 ? AppTheme.primary.withValues(alpha: 0.3)
                 : isAdmin && !isOwner
                     ? AppTheme.primary.withValues(alpha: 0.15)
-                    : const Color(0xFF1A2545),
+                    : AppTheme.of(context).border,
           ),
         ),
         child: Padding(
@@ -256,8 +256,8 @@ class _PostCardState extends State<PostCard> {
               if (post.ratingCount > 0)
                 Text(
                   '${post.ratingCount} rated',
-                  style: const TextStyle(
-                      fontSize: 9, color: AppTheme.onSurfaceMuted),
+                  style: TextStyle(
+                      fontSize: 9, color: AppTheme.of(context).onSurfaceMuted),
                 ),
             ],
           ),
@@ -300,15 +300,26 @@ class _PostCardState extends State<PostCard> {
               Row(
                 children: [
                   Flexible(
-                    child: Text(
-                      showAnon ? '@anonymous' : '@${displayHandle ?? 'anon'}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        color: showAnon ? AppTheme.onSurfaceMuted : AppTheme.onSurface,
-                        fontStyle: showAnon ? FontStyle.italic : FontStyle.normal,
+                    child: GestureDetector(
+                      onTap: showAnon
+                          ? null
+                          : () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => ProfileScreen(
+                                        userId: widget.post.authorId)),
+                              ),
+                      child: Text(
+                        showAnon ? '@anonymous' : '@${displayHandle ?? 'anon'}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: showAnon ? AppTheme.onSurfaceMuted : AppTheme.onSurface,
+                          fontStyle: showAnon ? FontStyle.italic : FontStyle.normal,
+                          decoration: showAnon ? null : TextDecoration.none,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (isAdmin && !isOwner) ...[
@@ -319,7 +330,7 @@ class _PostCardState extends State<PostCard> {
               ),
               Text(
                 TimeUtils.format(widget.post.createdAt),
-                style: const TextStyle(fontSize: 12, color: AppTheme.onSurfaceMuted),
+                style: TextStyle(fontSize: 12, color: AppTheme.of(context).onSurfaceMuted),
               ),
             ],
           ),
@@ -332,8 +343,8 @@ class _PostCardState extends State<PostCard> {
   Widget _buildMoreMenu(BuildContext context, bool canModify, bool isOwner,
       bool isAdmin, FeedProvider feed) {
     return PopupMenuButton<String>(
-      color: AppTheme.surfaceVariant,
-      icon: const Icon(Icons.more_vert, color: AppTheme.onSurfaceMuted, size: 18),
+      color: AppTheme.of(context).surfaceVariant,
+      icon: Icon(Icons.more_vert, color: AppTheme.of(context).onSurfaceMuted, size: 18),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       onSelected: (val) async {
         switch (val) {
@@ -446,7 +457,7 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildContent(BuildContext context) {
-    const base = TextStyle(color: AppTheme.onSurface, fontSize: 15, height: 1.5);
+    final base = TextStyle(color: AppTheme.of(context).onSurface, fontSize: 15, height: 1.5);
     final text = widget.post.content;
     final hashSpans = HashtagUtils.buildRichSpans(
       text,
@@ -512,13 +523,13 @@ class _PostCardState extends State<PostCard> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.chat_bubble_outline,
-                  color: AppTheme.onSurfaceMuted, size: 18),
+              Icon(Icons.chat_bubble_outline,
+                  color: AppTheme.of(context).onSurfaceMuted, size: 18),
               if (post.commentCount > 0) ...[
                 const SizedBox(width: 4),
                 Text('${post.commentCount}',
-                    style: const TextStyle(
-                        color: AppTheme.onSurfaceMuted, fontSize: 13)),
+                    style: TextStyle(
+                        color: AppTheme.of(context).onSurfaceMuted, fontSize: 13)),
               ],
             ],
           ),
@@ -538,16 +549,16 @@ class _PostCardState extends State<PostCard> {
           const SizedBox(width: 3),
           Text(
             '(${post.ratingCount})',
-            style: const TextStyle(fontSize: 11, color: AppTheme.onSurfaceMuted),
+            style: TextStyle(fontSize: 11, color: AppTheme.of(context).onSurfaceMuted),
           ),
         ],
         const Spacer(),
         if (isOwner)
           GestureDetector(
             onTap: () => _showAnalytics(context),
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.only(right: 10),
-              child: Icon(Icons.bar_chart, color: AppTheme.onSurfaceMuted, size: 18),
+              child: Icon(Icons.bar_chart, color: AppTheme.of(context).onSurfaceMuted, size: 18),
             ),
           ),
         GestureDetector(
@@ -575,8 +586,8 @@ class _AnonAvatar extends StatelessWidget {
         color: AppTheme.onSurfaceMuted.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
-      child: const Icon(Icons.person_outline,
-          color: AppTheme.onSurfaceMuted, size: 22),
+      child: Icon(Icons.person_outline,
+          color: AppTheme.of(context).onSurfaceMuted, size: 22),
     );
   }
 }

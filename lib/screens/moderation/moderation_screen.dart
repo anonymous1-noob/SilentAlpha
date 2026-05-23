@@ -64,7 +64,7 @@ class _ModerationScreenState extends State<ModerationScreen> {
                       Text(
                         'Queue is clear!',
                         style:
-                            TextStyle(color: AppTheme.onSurfaceMuted),
+                            TextStyle(color: AppTheme.of(context).onSurfaceMuted),
                       ),
                     ],
                   ),
@@ -113,8 +113,8 @@ class _ModerationScreenState extends State<ModerationScreen> {
                                                 '') ??
                                         DateTime.now(),
                                   ),
-                                  style: const TextStyle(
-                                    color: AppTheme.onSurfaceMuted,
+                                  style: TextStyle(
+                                    color: AppTheme.of(context).onSurfaceMuted,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -126,8 +126,8 @@ class _ModerationScreenState extends State<ModerationScreen> {
                                 postContent,
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: AppTheme.onSurface,
+                                style: TextStyle(
+                                  color: AppTheme.of(context).onSurface,
                                   fontSize: 14,
                                 ),
                               ),
@@ -144,7 +144,7 @@ class _ModerationScreenState extends State<ModerationScreen> {
                                       foregroundColor:
                                           AppTheme.onSurfaceMuted,
                                       side: const BorderSide(
-                                          color: AppTheme.onSurfaceMuted),
+                                          color: AppTheme.of(context).onSurfaceMuted),
                                     ),
                                     child: const Text('Dismiss'),
                                   ),

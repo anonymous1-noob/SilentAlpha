@@ -219,7 +219,7 @@ class _AppColors {
         cardBg         = const Color(0xFF0F3460),
         onSurface      = const Color(0xFFE8E8F0),
         onSurfaceMuted = const Color(0xFF9898B0),
-        border         = const Color(0xFF1A2545);
+        border         = const Color(0xFF2A2A4A);
 
   const _AppColors._light()
       : surface        = _L.surface,

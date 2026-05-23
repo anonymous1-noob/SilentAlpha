@@ -48,8 +48,8 @@ class _PostAnalyticsSheetState extends State<PostAnalyticsSheet> {
     final avgColor = _ratingColor(post.avgRating);
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.surfaceVariant,
+      decoration: BoxDecoration(
+        color: AppTheme.of(context).surfaceVariant,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -122,9 +122,9 @@ class _PostAnalyticsSheetState extends State<PostAnalyticsSheet> {
               ),
             )
           else if (_distribution.isEmpty)
-            const Text(
+            Text(
               'No ratings yet.',
-              style: TextStyle(color: AppTheme.onSurfaceMuted),
+              style: TextStyle(color: AppTheme.of(context).onSurfaceMuted),
             )
           else ..._buildDistributionBars(),
 
@@ -191,7 +191,7 @@ class _PostAnalyticsSheetState extends State<PostAnalyticsSheet> {
               width: 28,
               child: Text(
                 '$cnt',
-                style: const TextStyle(fontSize: 12, color: AppTheme.onSurfaceMuted),
+                style: TextStyle(fontSize: 12, color: AppTheme.of(context).onSurfaceMuted),
                 textAlign: TextAlign.right,
               ),
             ),
@@ -225,7 +225,7 @@ class _StatTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppTheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF1A2545)),
+          border: Border.all(color: AppTheme.of(context).border),
         ),
         child: Column(
           children: [
@@ -241,7 +241,7 @@ class _StatTile extends StatelessWidget {
             ),
             Text(
               label,
-              style: const TextStyle(fontSize: 10, color: AppTheme.onSurfaceMuted),
+              style: TextStyle(fontSize: 10, color: AppTheme.of(context).onSurfaceMuted),
               textAlign: TextAlign.center,
             ),
           ],

@@ -77,8 +77,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               child: Center(
                 child: Text(
                   'Updated today',
-                  style: const TextStyle(
-                      color: AppTheme.onSurfaceMuted, fontSize: 11),
+                  style: TextStyle(
+                      color: AppTheme.of(context).onSurfaceMuted, fontSize: 11),
                 ),
               ),
             ),
@@ -133,7 +133,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                               ? AppTheme.primary.withValues(alpha: 0.5)
                               : isMe
                                   ? AppTheme.primary.withValues(alpha: 0.4)
-                                  : const Color(0xFF1A2545),
+                                  : AppTheme.of(context).border,
                           width: isTopThree ? 1.5 : 1,
                         ),
                         boxShadow: isTopThree
@@ -249,11 +249,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                     ),
                                   ),
                                 ),
-                                const Text(
+                                Text(
                                   'pts',
                                   style: TextStyle(
                                       fontSize: 10,
-                                      color: AppTheme.onSurfaceMuted),
+                                      color: AppTheme.of(context).onSurfaceMuted),
                                 ),
                               ],
                             ),

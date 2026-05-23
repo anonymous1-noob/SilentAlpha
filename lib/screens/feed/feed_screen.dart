@@ -123,9 +123,9 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppTheme.onSurfaceMuted),
+            Icon(Icons.error_outline, size: 48, color: AppTheme.of(context).onSurfaceMuted),
             const SizedBox(height: 12),
-            Text(feed.error!, style: const TextStyle(color: AppTheme.onSurfaceMuted)),
+            Text(feed.error!, style: TextStyle(color: AppTheme.of(context).onSurfaceMuted)),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => context.read<FeedProvider>().refresh(),
@@ -144,7 +144,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             Icon(
               feed.feedType == FeedType.following ? Icons.people_outline : Icons.chat_bubble_outline,
               size: 64,
-              color: AppTheme.onSurfaceMuted,
+              color: AppTheme.of(context).onSurfaceMuted,
             ),
             const SizedBox(height: 16),
             Text(
@@ -152,7 +152,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
                   ? 'No posts from people you follow.\nFollow some users to see their posts!'
                   : 'No posts yet.\nBe the first to share your analysis!',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppTheme.onSurfaceMuted, height: 1.5),
+              style: TextStyle(color: AppTheme.of(context).onSurfaceMuted, height: 1.5),
             ),
           ],
         ),

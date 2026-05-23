@@ -48,7 +48,7 @@ class CommentTile extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceVariant,
+                    color: AppTheme.of(context).surfaceVariant,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -72,8 +72,8 @@ class CommentTile extends StatelessWidget {
                   children: [
                     Text(
                       TimeUtils.format(comment.createdAt),
-                      style: const TextStyle(
-                          fontSize: 11, color: AppTheme.onSurfaceMuted),
+                      style: TextStyle(
+                          fontSize: 11, color: AppTheme.of(context).onSurfaceMuted),
                     ),
                     const SizedBox(width: 10),
                     // Up vote
@@ -166,7 +166,7 @@ class _CommentText extends StatelessWidget {
       if (m.start > last) {
         spans.add(TextSpan(
           text: content.substring(last, m.start),
-          style: const TextStyle(color: AppTheme.onSurface, fontSize: 14, height: 1.4),
+          style: TextStyle(color: AppTheme.of(context).onSurface, fontSize: 14, height: 1.4),
         ));
       }
       spans.add(TextSpan(
@@ -183,7 +183,7 @@ class _CommentText extends StatelessWidget {
     if (last < content.length) {
       spans.add(TextSpan(
         text: content.substring(last),
-        style: const TextStyle(color: AppTheme.onSurface, fontSize: 14, height: 1.4),
+        style: TextStyle(color: AppTheme.of(context).onSurface, fontSize: 14, height: 1.4),
       ));
     }
     return RichText(text: TextSpan(children: spans));

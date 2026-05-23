@@ -76,11 +76,11 @@ class _TickerFeedScreenState extends State<TickerFeedScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.show_chart, size: 64, color: AppTheme.onSurfaceMuted),
+                        Icon(Icons.show_chart, size: 64, color: AppTheme.of(context).onSurfaceMuted),
                         const SizedBox(height: 16),
                         Text(
                           'No posts about \$${widget.ticker}',
-                          style: const TextStyle(color: AppTheme.onSurfaceMuted),
+                          style: TextStyle(color: AppTheme.of(context).onSurfaceMuted),
                         ),
                       ],
                     ),

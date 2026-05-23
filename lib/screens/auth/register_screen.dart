@@ -82,9 +82,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 FadeInDown(
                   delay: const Duration(milliseconds: 100),
-                  child: const Text(
+                  child: Text(
                     'Join the finance conversation',
-                    style: TextStyle(color: AppTheme.onSurfaceMuted, fontSize: 15),
+                    style: TextStyle(color: AppTheme.of(context).onSurfaceMuted, fontSize: 15),
                   ),
                 ),
                 const SizedBox(height: 36),
@@ -92,11 +92,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   delay: const Duration(milliseconds: 200),
                   child: TextFormField(
                     controller: _handleCtrl,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Handle (e.g. vikas_trades)',
-                      prefixIcon: Icon(Icons.alternate_email, color: AppTheme.onSurfaceMuted),
+                      prefixIcon: Icon(Icons.alternate_email, color: AppTheme.of(context).onSurfaceMuted),
                       helperText: 'Unique · lowercase · no spaces',
-                      helperStyle: TextStyle(color: AppTheme.onSurfaceMuted, fontSize: 11),
+                      helperStyle: TextStyle(color: AppTheme.of(context).onSurfaceMuted, fontSize: 11),
                     ),
                     onChanged: (v) {
                       final clean = v.toLowerCase().replaceAll(RegExp(r'[^a-z0-9_]'), '');
@@ -121,9 +121,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: TextFormField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Email',
-                      prefixIcon: Icon(Icons.email_outlined, color: AppTheme.onSurfaceMuted),
+                      prefixIcon: Icon(Icons.email_outlined, color: AppTheme.of(context).onSurfaceMuted),
                     ),
                     validator: (v) => v != null && v.contains('@') ? null : 'Enter a valid email',
                   ),
@@ -136,11 +136,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: _obscure,
                     decoration: InputDecoration(
                       hintText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.onSurfaceMuted),
+                      prefixIcon: Icon(Icons.lock_outline, color: AppTheme.of(context).onSurfaceMuted),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                          color: AppTheme.onSurfaceMuted,
+                          color: AppTheme.of(context).onSurfaceMuted,
                         ),
                         onPressed: () => setState(() => _obscure = !_obscure),
                       ),
@@ -160,10 +160,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 20),
                 FadeInUp(
                   delay: const Duration(milliseconds: 500),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'By signing up you agree to our terms of service.',
-                      style: TextStyle(color: AppTheme.onSurfaceMuted, fontSize: 12),
+                      style: TextStyle(color: AppTheme.of(context).onSurfaceMuted, fontSize: 12),
                       textAlign: TextAlign.center,
                     ),
                   ),

@@ -23,7 +23,7 @@ class ShimmerLoader extends StatelessWidget {
         height: height,
         width: width ?? double.infinity,
         decoration: BoxDecoration(
-          color: AppTheme.surfaceVariant,
+          color: AppTheme.of(context).surfaceVariant,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),

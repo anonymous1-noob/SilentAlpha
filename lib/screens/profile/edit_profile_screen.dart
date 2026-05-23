@@ -145,8 +145,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ? Container(
                             width: 96,
                             height: 96,
-                            decoration: const BoxDecoration(
-                              color: AppTheme.surfaceVariant,
+                            decoration: BoxDecoration(
+                              color: AppTheme.of(context).surfaceVariant,
                               shape: BoxShape.circle,
                             ),
                             child: const Center(
@@ -192,7 +192,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const SizedBox(width: 6),
                   Text(
                     '· ${widget.user.userScore} pts',
-                    style: const TextStyle(color: AppTheme.onSurfaceMuted, fontSize: 12),
+                    style: TextStyle(color: AppTheme.of(context).onSurfaceMuted, fontSize: 12),
                   ),
                 ],
               );
@@ -200,10 +200,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 32),
             TextFormField(
               controller: _handleCtrl,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Handle',
                 prefixText: '@',
-                prefixIcon: Icon(Icons.alternate_email, color: AppTheme.onSurfaceMuted),
+                prefixIcon: Icon(Icons.alternate_email, color: AppTheme.of(context).onSurfaceMuted),
                 helperText: 'Lowercase, letters/numbers/underscores only',
                 helperStyle: TextStyle(fontSize: 11),
               ),
@@ -221,9 +221,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             TextFormField(
               controller: _taglineCtrl,
               maxLength: 60,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Tagline',
-                prefixIcon: Icon(Icons.format_quote, color: AppTheme.onSurfaceMuted),
+                prefixIcon: Icon(Icons.format_quote, color: AppTheme.of(context).onSurfaceMuted),
                 hintText: 'e.g. Long-term investor · Nifty analyst',
                 counterStyle: TextStyle(fontSize: 11),
               ),
@@ -233,10 +233,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               controller: _bioCtrl,
               maxLines: 3,
               maxLength: 150,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Bio',
                 alignLabelWithHint: true,
-                prefixIcon: Icon(Icons.notes, color: AppTheme.onSurfaceMuted),
+                prefixIcon: Icon(Icons.notes, color: AppTheme.of(context).onSurfaceMuted),
               ),
             ),
             const SizedBox(height: 28),

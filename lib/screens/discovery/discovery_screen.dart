@@ -136,7 +136,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
                     controller: _searchCtrl,
                     decoration: InputDecoration(
                       hintText: _tabCtrl.index == 0 ? 'Search posts...' : 'Search people...',
-                      prefixIcon: const Icon(Icons.search, color: AppTheme.onSurfaceMuted),
+                      prefixIcon: Icon(Icons.search, color: AppTheme.of(context).onSurfaceMuted),
                       suffixIcon: _activeQuery.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.close, size: 18),
@@ -328,10 +328,10 @@ class _PostsTab extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.search_off, size: 48, color: AppTheme.onSurfaceMuted),
+                    Icon(Icons.search_off, size: 48, color: AppTheme.of(context).onSurfaceMuted),
                     const SizedBox(height: 12),
                     Text('No results for "$query"',
-                        style: const TextStyle(color: AppTheme.onSurfaceMuted)),
+                        style: TextStyle(color: AppTheme.of(context).onSurfaceMuted)),
                   ],
                 ),
               ),
@@ -380,14 +380,14 @@ class _PeopleTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!isSearching) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.person_search, size: 64, color: AppTheme.onSurfaceMuted),
+            Icon(Icons.person_search, size: 64, color: AppTheme.of(context).onSurfaceMuted),
             SizedBox(height: 12),
             Text('Type to search for users',
-                style: TextStyle(color: AppTheme.onSurfaceMuted)),
+                style: TextStyle(color: AppTheme.of(context).onSurfaceMuted)),
           ],
         ),
       );
@@ -403,10 +403,10 @@ class _PeopleTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.search_off, size: 48, color: AppTheme.onSurfaceMuted),
+            Icon(Icons.search_off, size: 48, color: AppTheme.of(context).onSurfaceMuted),
             const SizedBox(height: 12),
             Text('No users found for "$query"',
-                style: const TextStyle(color: AppTheme.onSurfaceMuted)),
+                style: TextStyle(color: AppTheme.of(context).onSurfaceMuted)),
           ],
         ),
       );
@@ -434,7 +434,7 @@ class _PeopleTab extends StatelessWidget {
                   style: TextStyle(fontSize: 12, color: user.badge.color)),
               const SizedBox(width: 8),
               Text('${user.followerCount} followers',
-                  style: const TextStyle(fontSize: 12, color: AppTheme.onSurfaceMuted)),
+                  style: TextStyle(fontSize: 12, color: AppTheme.of(context).onSurfaceMuted)),
             ],
           ),
           onTap: () => Navigator.push(

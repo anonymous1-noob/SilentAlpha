@@ -294,10 +294,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               minLines: 5,
               maxLength: 2000,
               style: const TextStyle(fontSize: 16, height: 1.5),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: "What's your take? Use #hashtags and \$TICKERS.",
                 border: InputBorder.none,
-                counterStyle: TextStyle(color: AppTheme.onSurfaceMuted),
+                counterStyle: TextStyle(color: AppTheme.of(context).onSurfaceMuted),
               ),
               onChanged: (_) => setState(() {}),
             ),
@@ -400,11 +400,11 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             // Category picker (only if multiple)
             if (cats.length > 1) ...[
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Category',
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.onSurfaceMuted,
+                    color: AppTheme.of(context).onSurfaceMuted,
                     fontSize: 13),
               ),
               const SizedBox(height: 8),
@@ -499,7 +499,7 @@ class _AnonToggle extends StatelessWidget {
                 ),
                 Text(
                   isAnonymous ? 'Your identity is hidden' : 'Your handle will be visible',
-                  style: const TextStyle(fontSize: 11, color: AppTheme.onSurfaceMuted),
+                  style: TextStyle(fontSize: 11, color: AppTheme.of(context).onSurfaceMuted),
                 ),
               ],
             ),
@@ -593,9 +593,9 @@ class _PollCreator extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceVariant,
+        color: AppTheme.of(context).surfaceVariant,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2A2A4A)),
+        border: Border.all(color: AppTheme.of(context).border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -612,9 +612,9 @@ class _PollCreator extends StatelessWidget {
           TextField(
             controller: questionCtrl,
             maxLength: 200,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Question...',
-              counterStyle: TextStyle(color: AppTheme.onSurfaceMuted, fontSize: 10),
+              counterStyle: TextStyle(color: AppTheme.of(context).onSurfaceMuted, fontSize: 10),
             ),
           ),
           const SizedBox(height: 8),
@@ -646,7 +646,7 @@ class _PollCreator extends StatelessWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(Icons.schedule, size: 14, color: AppTheme.onSurfaceMuted),
+              Icon(Icons.schedule, size: 14, color: AppTheme.of(context).onSurfaceMuted),
               const SizedBox(width: 6),
               GestureDetector(
                 onTap: onPickDeadline,
@@ -664,7 +664,7 @@ class _PollCreator extends StatelessWidget {
                 const SizedBox(width: 6),
                 GestureDetector(
                   onTap: onClearDeadline,
-                  child: const Icon(Icons.close, size: 14, color: AppTheme.onSurfaceMuted),
+                  child: Icon(Icons.close, size: 14, color: AppTheme.of(context).onSurfaceMuted),
                 ),
               ],
             ],

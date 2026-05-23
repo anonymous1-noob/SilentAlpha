@@ -43,6 +43,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     try {
       await SupabaseService.approveFollowRequest(n.actorId!);
       if (mounted) setState(() => _notifs.remove(n));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to accept: $e'), backgroundColor: Colors.red),
+        );
+      }
     } finally {
       if (mounted) setState(() => _processingIds.remove(n.id));
     }
@@ -54,6 +60,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     try {
       await SupabaseService.rejectFollowRequest(n.actorId!);
       if (mounted) setState(() => _notifs.remove(n));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to decline: $e'), backgroundColor: Colors.red),
+        );
+      }
     } finally {
       if (mounted) setState(() => _processingIds.remove(n.id));
     }
@@ -79,15 +91,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           : _notifs.isEmpty
               ? Center(
                   child: FadeIn(
-                    child: const Column(
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.notifications_none,
-                            size: 64, color: AppTheme.onSurfaceMuted),
+                            size: 64, color: AppTheme.of(context).onSurfaceMuted),
                         SizedBox(height: 16),
                         Text(
                           'No notifications yet',
-                          style: TextStyle(color: AppTheme.onSurfaceMuted),
+                          style: TextStyle(color: AppTheme.of(context).onSurfaceMuted),
                         ),
                       ],
                     ),
@@ -135,7 +147,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               title: Text(
                                 n.label,
                                 style: TextStyle(
-                                  color: AppTheme.onSurface,
+                                  color: AppTheme.of(context).onSurface,
                                   fontWeight: n.read
                                       ? FontWeight.normal
                                       : FontWeight.w600,
@@ -144,8 +156,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               ),
                               subtitle: Text(
                                 TimeUtils.format(n.createdAt),
-                                style: const TextStyle(
-                                  color: AppTheme.onSurfaceMuted,
+                                style: TextStyle(
+                                  color: AppTheme.of(context).onSurfaceMuted,
                                   fontSize: 12,
                                 ),
                               ),

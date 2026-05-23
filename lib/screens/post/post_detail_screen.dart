@@ -153,12 +153,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     ),
                   )
                 else if (comments.isEmpty)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(24),
                     child: Center(
                       child: Text(
                         'No comments yet. Start the conversation!',
-                        style: TextStyle(color: AppTheme.onSurfaceMuted),
+                        style: TextStyle(color: AppTheme.of(context).onSurfaceMuted),
                       ),
                     ),
                   )
@@ -202,8 +202,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         top: 8,
         bottom: MediaQuery.of(context).viewInsets.bottom + 8,
       ),
-      decoration: const BoxDecoration(
-        color: AppTheme.surfaceVariant,
+      decoration: BoxDecoration(
+        color: AppTheme.of(context).surfaceVariant,
         border: Border(
             top: BorderSide(color: Color(0xFF2A2A4A), width: 1)),
       ),
@@ -292,8 +292,8 @@ class _MentionSuggestions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(maxHeight: 200),
-      decoration: const BoxDecoration(
-        color: AppTheme.surfaceVariant,
+      decoration: BoxDecoration(
+        color: AppTheme.of(context).surfaceVariant,
         border: Border(
           top: BorderSide(color: Color(0xFF2A2A4A)),
           bottom: BorderSide(color: Color(0xFF2A2A4A)),
