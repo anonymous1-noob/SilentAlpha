@@ -60,9 +60,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     final currentId = SupabaseService.currentUserId;
 
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: ShaderMask(
           shaderCallback: (b) => AppTheme.gradient.createShader(b),
           child: const Text(

@@ -61,7 +61,7 @@ class _HomeShellState extends State<HomeShell> {
     ];
 
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       body: IndexedStack(
         index: _index,
         children: screens,
@@ -115,7 +115,7 @@ class _HomeShellState extends State<HomeShell> {
       floatingActionButton: _index == 0
           ? FloatingActionButton.small(
               heroTag: 'leaderboard',
-              backgroundColor: AppTheme.surfaceVariant,
+              backgroundColor: AppTheme.of(context).surfaceVariant,
               foregroundColor: AppTheme.primary,
               onPressed: () => Navigator.push(
                 context,

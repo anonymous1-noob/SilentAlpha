@@ -44,9 +44,9 @@ class _TickerFeedScreenState extends State<TickerFeedScreen> {
     return ChangeNotifierProvider.value(
       value: context.read<FeedProvider>(),
       child: Scaffold(
-        backgroundColor: AppTheme.surface,
+        backgroundColor: AppTheme.of(context).surface,
         appBar: AppBar(
-          backgroundColor: AppTheme.surfaceVariant,
+          backgroundColor: AppTheme.of(context).surfaceVariant,
           title: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

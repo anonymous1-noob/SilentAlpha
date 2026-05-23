@@ -347,7 +347,7 @@ class _PostCardState extends State<PostCard> {
             final confirm = await showDialog<bool>(
               context: context,
               builder: (_) => AlertDialog(
-                backgroundColor: AppTheme.surfaceVariant,
+                backgroundColor: AppTheme.of(context).surfaceVariant,
                 title: const Text('Delete post?'),
                 content: const Text('This action cannot be undone.'),
                 actions: [

@@ -62,9 +62,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: const Text('Activity'),
         actions: [
           IconButton(

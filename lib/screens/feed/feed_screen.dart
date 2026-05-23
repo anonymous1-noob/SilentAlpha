@@ -47,14 +47,14 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
     final feed = context.watch<FeedProvider>();
 
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       body: NestedScrollView(
         headerSliverBuilder: (_, __) => [
           SliverAppBar(
             floating: true,
             snap: true,
             pinned: false,
-            backgroundColor: AppTheme.surfaceVariant,
+            backgroundColor: AppTheme.of(context).surfaceVariant,
             title: ShaderMask(
               shaderCallback: (b) => AppTheme.gradient.createShader(b),
               child: const Text(

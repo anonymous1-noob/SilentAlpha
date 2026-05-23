@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import '../../models/models.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/feed_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../services/supabase_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/avatar_utils.dart';
@@ -160,8 +161,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
-        backgroundColor: AppTheme.surface,
+      return Scaffold(
+        backgroundColor: AppTheme.of(context).surface,
         body: Center(child: CircularProgressIndicator(color: AppTheme.primary)),
       );
     }
@@ -169,12 +170,19 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: Text(_profile?.handle != null ? '@${_profile!.handle}' : 'Profile'),
         actions: [
           if (_isOwn) ...[
+            Consumer<ThemeProvider>(
+              builder: (_, tp, __) => IconButton(
+                icon: Icon(tp.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+                tooltip: tp.isDark ? 'Switch to light mode' : 'Switch to dark mode',
+                onPressed: tp.toggle,
+              ),
+            ),
             if (auth.user?.isAdmin == true)
               IconButton(
                 icon: ShaderMask(

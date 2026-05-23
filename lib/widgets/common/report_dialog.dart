@@ -29,7 +29,7 @@ class _ReportDialogState extends State<ReportDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppTheme.surfaceVariant,
+      backgroundColor: AppTheme.of(context).surfaceVariant,
       title: const Text('Report content'),
       content: Column(
         mainAxisSize: MainAxisSize.min,

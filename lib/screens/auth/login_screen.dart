@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),

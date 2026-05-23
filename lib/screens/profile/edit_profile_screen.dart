@@ -104,7 +104,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: const Text('Sign out?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
@@ -121,9 +121,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: const Text('Edit Profile'),
         actions: [
           IconButton(

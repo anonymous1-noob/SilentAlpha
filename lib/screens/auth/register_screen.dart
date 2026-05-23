@@ -58,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(

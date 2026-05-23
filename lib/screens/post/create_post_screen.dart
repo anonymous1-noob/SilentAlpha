@@ -254,9 +254,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         _contentCtrl.text.trim().isNotEmpty && _selectedCategoryId != null;
 
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: const Text('New Post'),
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -420,7 +420,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         () => _selectedCategoryId = sel ? null : cat.id),
                     selectedColor: AppTheme.primary,
                     checkmarkColor: Colors.white,
-                    backgroundColor: AppTheme.surfaceVariant,
+                    backgroundColor: AppTheme.of(context).surfaceVariant,
                     labelStyle: TextStyle(
                       color: sel ? Colors.white : AppTheme.onSurface,
                       fontSize: 12,

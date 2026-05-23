@@ -10,6 +10,7 @@ import 'providers/feed_provider.dart';
 import 'providers/comments_provider.dart';
 import 'providers/categories_provider.dart';
 import 'providers/notification_provider.dart';
+import 'providers/theme_provider.dart';
 import 'utils/app_theme.dart';
 
 Future<void> main() async {
@@ -44,12 +45,17 @@ class SilentAlphaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CommentsProvider()),
         ChangeNotifierProvider(create: (_) => CategoriesProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        title: 'SilentAlpha',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.dark,
-        home: const AuthGate(),
+      child: Consumer<ThemeProvider>(
+        builder: (_, themeProvider, __) => MaterialApp(
+          title: 'SilentAlpha',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: themeProvider.mode,
+          home: const AuthGate(),
+        ),
       ),
     );
   }

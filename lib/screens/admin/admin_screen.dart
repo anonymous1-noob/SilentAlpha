@@ -29,9 +29,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: Row(
           children: [
             ShaderMask(
@@ -98,7 +98,7 @@ class _CategoriesTabState extends State<_CategoriesTab> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: const Text('New Category'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -152,7 +152,7 @@ class _CategoriesTabState extends State<_CategoriesTab> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: const Text('Edit Category'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -203,7 +203,7 @@ class _CategoriesTabState extends State<_CategoriesTab> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: const Text('Delete category?'),
         content: Text('Delete "${cat['name']}"? Posts in this category will lose their category tag.'),
         actions: [
@@ -318,7 +318,7 @@ class _UsersTabState extends State<_UsersTab> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: Text(isAdmin ? 'Remove admin?' : 'Make admin?'),
         content: Text(
           isAdmin

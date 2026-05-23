@@ -117,7 +117,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
     final isSearching = _activeQuery.length >= 2;
 
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       body: SafeArea(
         child: Column(
           children: [

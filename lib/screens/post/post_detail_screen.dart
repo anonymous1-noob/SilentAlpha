@@ -121,9 +121,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         context.watch<CommentsProvider>().loadingFor(widget.post.id);
 
     return Scaffold(
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.of(context).surface,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceVariant,
+        backgroundColor: AppTheme.of(context).surfaceVariant,
         title: const Text('Post'),
       ),
       body: Column(
