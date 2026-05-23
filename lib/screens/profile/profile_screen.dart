@@ -100,6 +100,63 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     }
   }
 
+  Widget _buildFollowButton() {
+    if (_followLoading) {
+      return const SizedBox(
+        width: 110,
+        height: 36,
+        child: Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary),
+          ),
+        ),
+      );
+    }
+    if (_profile?.isFollowing == true) {
+      return GradientButton(label: 'Following', width: 110, onPressed: _toggleFollow);
+    }
+    if (_profile?.followRequestPending == true) {
+      return SizedBox(
+        width: 110,
+        height: 36,
+        child: OutlinedButton(
+          onPressed: _toggleFollow,
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: AppTheme.primary.withValues(alpha: 0.5), width: 1.5),
+            backgroundColor: AppTheme.primary.withValues(alpha: 0.08),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ShaderMask(
+                shaderCallback: (b) => AppTheme.gradient.createShader(b),
+                child: const Icon(Icons.hourglass_top_rounded, size: 13, color: Colors.white),
+              ),
+              const SizedBox(width: 5),
+              ShaderMask(
+                shaderCallback: (b) => AppTheme.gradient.createShader(b),
+                child: const Text(
+                  'Awaiting',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    return GradientButton(label: 'Follow', width: 110, onPressed: _toggleFollow);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -283,16 +340,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 ),
                 if (!_isOwn) ...[
                   const SizedBox(width: 8),
-                  GradientButton(
-                    label: _profile?.isFollowing ?? false
-                        ? 'Following'
-                        : (_profile?.followRequestPending ?? false)
-                            ? 'Requested'
-                            : 'Follow',
-                    loading: _followLoading,
-                    width: 110,
-                    onPressed: _toggleFollow,
-                  ),
+                  _buildFollowButton(),
                 ],
               ],
             ),

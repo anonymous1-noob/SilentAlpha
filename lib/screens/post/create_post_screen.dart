@@ -246,7 +246,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Widget build(BuildContext context) {
     final cats = context.watch<CategoriesProvider>().categories;
     final auth = context.watch<AuthProvider>();
-    final remaining = 500 - _contentCtrl.text.length;
+    final remaining = 2000 - _contentCtrl.text.length;
 
     _autoSelectCategory(cats);
 
@@ -292,7 +292,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               controller: _contentCtrl,
               maxLines: null,
               minLines: 5,
-              maxLength: 500,
+              maxLength: 2000,
               style: const TextStyle(fontSize: 16, height: 1.5),
               decoration: const InputDecoration(
                 hintText: "What's your take? Use #hashtags and \$TICKERS.",
