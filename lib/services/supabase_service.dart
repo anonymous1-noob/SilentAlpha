@@ -205,21 +205,8 @@ class SupabaseService {
         'following_id': targetId,
       });
 
-  static Future<void> requestFollow(String targetId) async {
-    await client.from('follow_requests').upsert({
-      'requester_id': currentUserId!,
-      'target_id': targetId,
-      'status': 'pending',
-      'created_at': DateTime.now().toUtc().toIso8601String(),
-    }, onConflict: 'requester_id,target_id');
-    await client.from('notifications').insert({
-      'recipient_id': targetId,
-      'actor_id': currentUserId!,
-      'type': 'follow_request',
-      'read': false,
-      'created_at': DateTime.now().toUtc().toIso8601String(),
-    });
-  }
+  static Future<void> requestFollow(String targetId) =>
+      client.rpc('send_follow_request', params: {'p_target_id': targetId});
 
   static Future<void> cancelFollowRequest(String targetId) =>
       client.from('follow_requests').delete().match({
@@ -271,24 +258,10 @@ class SupabaseService {
         .where((h) => h != 'anonymous')
         .toSet();
     if (mentions.isEmpty) return;
-    for (final handle in mentions) {
-      final rows = await client
-          .from('profiles')
-          .select('id')
-          .eq('handle', handle)
-          .limit(1);
-      if (rows.isEmpty) continue;
-      final targetId = rows.first['id'] as String;
-      if (targetId == currentUserId) continue;
-      await client.from('notifications').insert({
-        'recipient_id': targetId,
-        'actor_id': currentUserId!,
-        'type': 'mention',
-        'post_id': postId,
-        'read': false,
-        'created_at': DateTime.now().toUtc().toIso8601String(),
-      });
-    }
+    await client.rpc('notify_mentions', params: {
+      'p_post_id': postId,
+      'p_handles': mentions.toList(),
+    });
   }
 
   // ── Categories ────────────────────────────────────────────────────────────
