@@ -245,6 +245,7 @@ class SupabaseService {
         .from('profile_stats')
         .select('id')
         .order('user_score', ascending: false)
+        .order('id', ascending: true)
         .limit(3);
     final idx = top3.indexWhere((u) => u['id'] == userId);
     return idx >= 0 ? idx + 1 : null;
@@ -426,7 +427,10 @@ class SupabaseService {
   // ── Leaderboard ───────────────────────────────────────────────────────────
 
   static Future<List<Map<String, dynamic>>> getLeaderboard({int limit = 50}) =>
-      client.from('profile_stats').select().order('user_score', ascending: false).limit(limit);
+      client.from('profile_stats').select()
+          .order('user_score', ascending: false)
+          .order('id', ascending: true)
+          .limit(limit);
 
   // ── User Search ───────────────────────────────────────────────────────────
 
