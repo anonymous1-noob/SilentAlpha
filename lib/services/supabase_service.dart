@@ -99,7 +99,7 @@ class SupabaseService {
       'id': id,
       ...data,
       'author_id': currentUserId,
-      'created_at': DateTime.now().toIso8601String(),
+      'created_at': DateTime.now().toUtc().toIso8601String(),
     });
     return id;
   }
@@ -107,7 +107,7 @@ class SupabaseService {
   static Future<void> updatePost(String postId, Map<String, dynamic> data) =>
       client.from('posts').update({
         ...data,
-        'edited_at': DateTime.now().toIso8601String(),
+        'edited_at': DateTime.now().toUtc().toIso8601String(),
       }).eq('id', postId);
 
   static Future<void> deletePost(String postId) =>
