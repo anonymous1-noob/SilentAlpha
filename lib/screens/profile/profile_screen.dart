@@ -13,6 +13,7 @@ import '../../widgets/post/post_card.dart';
 import '../../widgets/common/gradient_button.dart';
 import 'edit_profile_screen.dart';
 import '../admin/admin_screen.dart';
+import '../help/faq_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String userId;
@@ -194,6 +195,14 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   MaterialPageRoute(builder: (_) => const AdminScreen()),
                 ),
               ),
+            IconButton(
+              icon: const Icon(Icons.help_outline_rounded),
+              tooltip: 'Help & FAQ',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FaqScreen()),
+              ),
+            ),
             IconButton(
               icon: const Icon(Icons.settings_outlined),
               onPressed: () async {
