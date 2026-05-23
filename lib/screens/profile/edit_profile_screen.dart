@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../models/models.dart';
@@ -43,22 +45,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _pickAvatar() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 512,
-      maxHeight: 512,
-      imageQuality: 85,
-    );
+    final picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked == null || !mounted) return;
+
+    final original = await picked.readAsBytes();
+    const maxSizeBytes = 5 * 1024 * 1024;
+    if (original.length > maxSizeBytes) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image must be under 5 MB')),
+        );
+      }
+      return;
+    }
+
     setState(() => _uploadingAvatar = true);
     try {
-      final bytes = await picked.readAsBytes();
-      final ext = picked.name.split('.').last.toLowerCase();
-      final mimeExt = ext == 'jpg' ? 'jpeg' : ext;
-      // Always store as .jpg so the path never changes between picks
-      final path = '${widget.user.id}.jpg';
-      await SupabaseService.uploadAvatar(path, bytes, mimeExt);
-      // Cache-bust so the app shows the new image immediately
+      // Compress to ≤ 100 KB at 512×512 max
+      Uint8List compressed = original;
+      int quality = 60;
+      while (compressed.length > 100 * 1024 && quality >= 10) {
+        compressed = await FlutterImageCompress.compressWithList(
+          original,
+          minWidth: 512,
+          minHeight: 512,
+          quality: quality,
+          format: CompressFormat.jpeg,
+        );
+        quality -= 15;
+      }
+
+      const path_suffix = '.jpg';
+      final path = '${widget.user.id}$path_suffix';
+      await SupabaseService.uploadAvatar(path, compressed, 'jpeg');
       final url =
           '${SupabaseService.getAvatarPublicUrl(path)}?t=${DateTime.now().millisecondsSinceEpoch}';
       await context.read<AuthProvider>().updateProfile(avatarUrl: url);
