@@ -314,7 +314,7 @@ class _PostCardState extends State<PostCard> {
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
-                          color: showAnon ? AppTheme.onSurfaceMuted : AppTheme.onSurface,
+                          color: showAnon ? AppTheme.of(context).onSurfaceMuted : AppTheme.of(context).onSurface,
                           fontStyle: showAnon ? FontStyle.italic : FontStyle.normal,
                           decoration: showAnon ? null : TextDecoration.none,
                         ),

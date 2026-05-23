@@ -422,7 +422,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     checkmarkColor: Colors.white,
                     backgroundColor: AppTheme.of(context).surfaceVariant,
                     labelStyle: TextStyle(
-                      color: sel ? Colors.white : AppTheme.onSurface,
+                      color: sel ? Colors.white : AppTheme.of(context).onSurface,
                       fontSize: 12,
                     ),
                   );
@@ -436,7 +436,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               child: Text(
                 '$remaining characters left',
                 style: TextStyle(
-                  color: remaining < 50 ? Colors.redAccent : AppTheme.onSurfaceMuted,
+                  color: remaining < 50 ? Colors.redAccent : AppTheme.of(context).onSurfaceMuted,
                   fontSize: 12,
                 ),
               ),
@@ -468,12 +468,12 @@ class _AnonToggle extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: isAnonymous
-            ? AppTheme.onSurfaceMuted.withValues(alpha: 0.1)
+            ? AppTheme.of(context).onSurfaceMuted.withValues(alpha: 0.1)
             : AppTheme.primary.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isAnonymous
-              ? AppTheme.onSurfaceMuted.withValues(alpha: 0.2)
+              ? AppTheme.of(context).onSurfaceMuted.withValues(alpha: 0.2)
               : AppTheme.primary.withValues(alpha: 0.2),
         ),
       ),
@@ -482,7 +482,7 @@ class _AnonToggle extends StatelessWidget {
           Icon(
             isAnonymous ? Icons.person_off_outlined : Icons.alternate_email,
             size: 18,
-            color: isAnonymous ? AppTheme.onSurfaceMuted : AppTheme.primary,
+            color: isAnonymous ? AppTheme.of(context).onSurfaceMuted : AppTheme.primary,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -494,7 +494,7 @@ class _AnonToggle extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
-                    color: isAnonymous ? AppTheme.onSurfaceMuted : AppTheme.onSurface,
+                    color: isAnonymous ? AppTheme.of(context).onSurfaceMuted : AppTheme.of(context).onSurface,
                   ),
                 ),
                 Text(
@@ -539,12 +539,12 @@ class _ActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: active
               ? AppTheme.primary.withValues(alpha: 0.15)
-              : AppTheme.surfaceVariant,
+              : AppTheme.of(context).surfaceVariant,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: active
                 ? AppTheme.primary.withValues(alpha: 0.4)
-                : const Color(0xFF2A2A4A),
+                : AppTheme.of(context).border,
           ),
         ),
         child: Row(
@@ -552,13 +552,13 @@ class _ActionButton extends StatelessWidget {
           children: [
             Icon(icon,
                 size: 16,
-                color: active ? AppTheme.primary : AppTheme.onSurfaceMuted),
+                color: active ? AppTheme.primary : AppTheme.of(context).onSurfaceMuted),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontSize: 13,
-                color: active ? AppTheme.primary : AppTheme.onSurfaceMuted,
+                color: active ? AppTheme.primary : AppTheme.of(context).onSurfaceMuted,
                 fontWeight: active ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

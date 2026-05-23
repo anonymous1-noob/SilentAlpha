@@ -384,8 +384,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     return TabBar(
       controller: _tabs,
       labelColor: AppTheme.primary,
-      unselectedLabelColor: AppTheme.onSurfaceMuted,
+      unselectedLabelColor: AppTheme.of(context).onSurfaceMuted,
       indicatorColor: AppTheme.primary,
+      dividerColor: Colors.transparent,
       tabs: [
         const Tab(text: 'Posts'),
         if (_isOwn) const Tab(text: 'Saved') else const Tab(text: ''),
@@ -480,7 +481,7 @@ class _Stat extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 20,
-            color: valueColor ?? AppTheme.onSurface,
+            color: valueColor ?? AppTheme.of(context).onSurface,
           ),
         ),
         Text(

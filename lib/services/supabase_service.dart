@@ -227,30 +227,11 @@ class SupabaseService {
         'target_id': targetId,
       });
 
-  static Future<void> approveFollowRequest(String requesterId) async {
-    await client.from('follows').insert({
-      'follower_id': requesterId,
-      'following_id': currentUserId!,
-      'created_at': DateTime.now().toUtc().toIso8601String(),
-    });
-    await client.from('follow_requests').update({'status': 'accepted'}).match({
-      'requester_id': requesterId,
-      'target_id': currentUserId!,
-    });
-    await client.from('notifications').insert({
-      'recipient_id': requesterId,
-      'actor_id': currentUserId!,
-      'type': 'follow',
-      'read': false,
-      'created_at': DateTime.now().toUtc().toIso8601String(),
-    });
-  }
+  static Future<void> approveFollowRequest(String requesterId) =>
+      client.rpc('accept_follow_request', params: {'p_requester_id': requesterId});
 
   static Future<void> rejectFollowRequest(String requesterId) =>
-      client.from('follow_requests').update({'status': 'rejected'}).match({
-        'requester_id': requesterId,
-        'target_id': currentUserId!,
-      });
+      client.rpc('reject_follow_request', params: {'p_requester_id': requesterId});
 
   static Future<List<Map<String, dynamic>>> getPendingFollowRequests() =>
       client.from('follow_requests')

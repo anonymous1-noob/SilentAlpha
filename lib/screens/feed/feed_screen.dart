@@ -68,8 +68,9 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
                 controller: _tabCtrl,
                 indicatorColor: AppTheme.primary,
                 indicatorWeight: 3,
+                dividerColor: Colors.transparent,
                 labelColor: AppTheme.primary,
-                unselectedLabelColor: AppTheme.onSurfaceMuted,
+                unselectedLabelColor: AppTheme.of(context).onSurfaceMuted,
                 labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                 tabs: const [
                   Tab(text: 'All'),

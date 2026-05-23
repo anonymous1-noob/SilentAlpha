@@ -183,8 +183,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                               style: OutlinedButton.styleFrom(
                                                 foregroundColor:
                                                     AppTheme.onSurfaceMuted,
-                                                side: const BorderSide(
-                                                    color: Color(0xFF2A2A4A)),
+                                                side: BorderSide(
+                                                    color: AppTheme.of(context).border),
                                                 padding: const EdgeInsets.symmetric(
                                                     vertical: 6),
                                                 shape: RoundedRectangleBorder(
@@ -217,7 +217,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                       ),
                               ),
                             ],
-                            const Divider(height: 1, color: Color(0xFF1A2545)),
+                            Divider(height: 1, color: AppTheme.of(context).border),
                           ],
                         ),
                       ),
