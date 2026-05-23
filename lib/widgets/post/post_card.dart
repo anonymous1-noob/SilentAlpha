@@ -270,7 +270,7 @@ class _PostCardState extends State<PostCard> {
 
   Widget _buildHeader(BuildContext context, bool canModify, bool isOwner,
       bool isAdmin, FeedProvider feed, AuthProvider auth) {
-    final showAnon = widget.post.isAnonymous && widget.post.authorId != auth.user?.id;
+    final showAnon = widget.post.isAnonymous;
     final displayHandle = showAnon ? null : widget.post.authorHandle;
 
     return Row(
@@ -311,10 +311,6 @@ class _PostCardState extends State<PostCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (widget.post.isAnonymous && isOwner) ...[
-                    const SizedBox(width: 4),
-                    _MiniChip(label: 'you', color: AppTheme.onSurfaceMuted),
-                  ],
                   if (isAdmin && !isOwner) ...[
                     const SizedBox(width: 4),
                     _MiniChip(label: 'admin', color: AppTheme.primary),
