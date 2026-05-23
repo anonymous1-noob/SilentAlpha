@@ -28,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   List<Post> _savedPosts = [];
   bool _loading = true;
   bool _followLoading = false;
+  int? _leaderboardRank;
 
   @override
   void initState() {
@@ -47,10 +48,17 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final data = await SupabaseService.getProfile(widget.userId);
+      final results = await Future.wait([
+        SupabaseService.getProfile(widget.userId),
+        SupabaseService.getPosts(authorId: widget.userId, limit: 50),
+        SupabaseService.getUserLeaderboardRank(widget.userId),
+      ]);
+      final data = results[0] as Map<String, dynamic>?;
+      final postRaw = results[1] as List<Map<String, dynamic>>;
+      final rank = results[2] as int?;
       if (data != null) _profile = AppUser.fromMap(data);
-      final postRaw = await SupabaseService.getPosts(authorId: widget.userId, limit: 50);
       _userPosts = postRaw.map(Post.fromMap).toList();
+      _leaderboardRank = rank;
       if (_isOwn) {
         final savedRaw = await SupabaseService.getSavedPosts();
         _savedPosts = savedRaw
@@ -74,15 +82,19 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     try {
       if (_profile!.isFollowing) {
         await SupabaseService.unfollowUser(widget.userId);
+        setState(() {
+          _profile = _profile!.copyWith(
+            isFollowing: false,
+            followerCount: _profile!.followerCount - 1,
+          );
+        });
+      } else if (_profile!.followRequestPending) {
+        await SupabaseService.cancelFollowRequest(widget.userId);
+        setState(() => _profile = _profile!.copyWith(followRequestPending: false));
       } else {
-        await SupabaseService.followUser(widget.userId);
+        await SupabaseService.requestFollow(widget.userId);
+        setState(() => _profile = _profile!.copyWith(followRequestPending: true));
       }
-      setState(() {
-        _profile = _profile!.copyWith(
-          isFollowing: !_profile!.isFollowing,
-          followerCount: _profile!.followerCount + (_profile!.isFollowing ? -1 : 1),
-        );
-      });
     } finally {
       if (mounted) setState(() => _followLoading = false);
     }
@@ -162,12 +174,55 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   Widget _buildProfileHeader(AuthProvider auth) {
     final badge = _profile?.badge;
+    final rank = _leaderboardRank;
+    final isTopThree = rank != null && rank <= 3;
+    final rankEmoji = rank != null && rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : null;
+
     return FadeInUp(
-      child: Padding(
+      child: Container(
+        decoration: isTopThree
+            ? BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.primary.withValues(alpha: 0.08),
+                    AppTheme.primary.withValues(alpha: 0.04),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              )
+            : null,
+        child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (isTopThree) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  gradient: AppTheme.gradient,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(rankEmoji!, style: const TextStyle(fontSize: 20)),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Top $rank on the Leaderboard',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -229,9 +284,13 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 if (!_isOwn) ...[
                   const SizedBox(width: 8),
                   GradientButton(
-                    label: _profile?.isFollowing ?? false ? 'Following' : 'Follow',
+                    label: _profile?.isFollowing ?? false
+                        ? 'Following'
+                        : (_profile?.followRequestPending ?? false)
+                            ? 'Requested'
+                            : 'Follow',
                     loading: _followLoading,
-                    width: 100,
+                    width: 110,
                     onPressed: _toggleFollow,
                   ),
                 ],
@@ -260,6 +319,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -190,13 +190,13 @@ class SupabaseService {
         'user_id': currentUserId!,
       });
 
-  // ── Follow ────────────────────────────────────────────────────────────────
+  // ── Follow (approval-gated) ───────────────────────────────────────────────
 
   static Future<void> followUser(String targetId) =>
       client.from('follows').upsert({
         'follower_id': currentUserId!,
         'following_id': targetId,
-        'created_at': DateTime.now().toIso8601String(),
+        'created_at': DateTime.now().toUtc().toIso8601String(),
       });
 
   static Future<void> unfollowUser(String targetId) =>
@@ -204,6 +204,110 @@ class SupabaseService {
         'follower_id': currentUserId!,
         'following_id': targetId,
       });
+
+  static Future<void> requestFollow(String targetId) async {
+    await client.from('follow_requests').upsert({
+      'requester_id': currentUserId!,
+      'target_id': targetId,
+      'status': 'pending',
+      'created_at': DateTime.now().toUtc().toIso8601String(),
+    }, onConflict: 'requester_id,target_id');
+    await client.from('notifications').insert({
+      'recipient_id': targetId,
+      'actor_id': currentUserId!,
+      'type': 'follow_request',
+      'read': false,
+      'created_at': DateTime.now().toUtc().toIso8601String(),
+    });
+  }
+
+  static Future<void> cancelFollowRequest(String targetId) =>
+      client.from('follow_requests').delete().match({
+        'requester_id': currentUserId!,
+        'target_id': targetId,
+      });
+
+  static Future<void> approveFollowRequest(String requesterId) async {
+    await client.from('follows').upsert({
+      'follower_id': requesterId,
+      'following_id': currentUserId!,
+      'created_at': DateTime.now().toUtc().toIso8601String(),
+    });
+    await client.from('follow_requests').update({'status': 'accepted'}).match({
+      'requester_id': requesterId,
+      'target_id': currentUserId!,
+    });
+    await client.from('notifications').insert({
+      'recipient_id': requesterId,
+      'actor_id': currentUserId!,
+      'type': 'follow',
+      'read': false,
+      'created_at': DateTime.now().toUtc().toIso8601String(),
+    });
+  }
+
+  static Future<void> rejectFollowRequest(String requesterId) =>
+      client.from('follow_requests').update({'status': 'rejected'}).match({
+        'requester_id': requesterId,
+        'target_id': currentUserId!,
+      });
+
+  static Future<List<Map<String, dynamic>>> getPendingFollowRequests() =>
+      client.from('follow_requests')
+          .select('*, profiles!requester_id(id, handle, avatar_url)')
+          .eq('target_id', currentUserId!)
+          .eq('status', 'pending')
+          .order('created_at', ascending: false);
+
+  static Future<int?> getUserLeaderboardRank(String userId) async {
+    final top3 = await client
+        .from('profile_stats')
+        .select('id')
+        .order('user_score', ascending: false)
+        .limit(3);
+    final idx = top3.indexWhere((u) => u['id'] == userId);
+    return idx >= 0 ? idx + 1 : null;
+  }
+
+  static Future<List<Map<String, dynamic>>> searchUsersForMention(String query) async {
+    if (query.isEmpty) return [];
+    return client
+        .from('profiles')
+        .select('id, handle, avatar_url')
+        .ilike('handle', '$query%')
+        .neq('handle', 'anonymous')
+        .limit(5);
+  }
+
+  static Future<void> createMentionNotifications({
+    required String postId,
+    required String content,
+  }) async {
+    final mentions = RegExp(r'@([a-z0-9_]+)', caseSensitive: false)
+        .allMatches(content)
+        .map((m) => m.group(1)!.toLowerCase())
+        .where((h) => h != 'anonymous')
+        .toSet();
+    if (mentions.isEmpty) return;
+    for (final handle in mentions) {
+      final rows = await client
+          .from('profiles')
+          .select('id')
+          .eq('handle', handle)
+          .limit(1);
+      if (rows.isEmpty) continue;
+      final targetId = rows.first['id'] as String;
+      if (targetId == currentUserId) continue;
+      await client.from('notifications').insert({
+        'recipient_id': targetId,
+        'actor_id': currentUserId!,
+        'type': 'mention',
+        'post_id': postId,
+        'read': false,
+        'created_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    }
+  }
 
   // ── Categories ────────────────────────────────────────────────────────────
 

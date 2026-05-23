@@ -40,7 +40,10 @@ class _HomeShellState extends State<HomeShell> {
         builder: (_) => const CreatePostScreen(),
       ),
     );
-    if (mounted) context.read<FeedProvider>().refresh();
+    if (mounted) {
+      setState(() => _index = 0);
+      context.read<FeedProvider>().refresh();
+    }
   }
 
   @override

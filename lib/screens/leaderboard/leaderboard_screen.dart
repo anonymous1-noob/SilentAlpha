@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/models.dart';
 import '../../services/supabase_service.dart';
 import '../../utils/app_theme.dart';
@@ -15,6 +16,9 @@ class LeaderboardScreen extends StatefulWidget {
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   List<AppUser> _users = [];
   bool _loading = true;
+  DateTime? _lastRefreshed;
+
+  static const _prefKey = 'leaderboard_last_refresh_ts';
 
   @override
   void initState() {
@@ -22,11 +26,29 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     _load();
   }
 
-  Future<void> _load() async {
+  Future<void> _load({bool force = false}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedTs = prefs.getInt(_prefKey);
+    final now = DateTime.now();
+
+    // Auto-refresh once per day
+    if (!force && storedTs != null) {
+      final lastRefresh = DateTime.fromMillisecondsSinceEpoch(storedTs);
+      if (now.difference(lastRefresh).inHours < 24 && _users.isNotEmpty) {
+        return;
+      }
+    }
+
     setState(() => _loading = true);
     try {
       final raw = await SupabaseService.getLeaderboard(limit: 50);
-      if (mounted) setState(() => _users = raw.map(AppUser.fromMap).toList());
+      if (mounted) {
+        setState(() {
+          _users = raw.map(AppUser.fromMap).toList();
+          _lastRefreshed = now;
+        });
+        await prefs.setInt(_prefKey, now.millisecondsSinceEpoch);
+      }
     } catch (_) {
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -48,12 +70,29 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
           ),
         ),
+        actions: [
+          if (_lastRefreshed != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: Center(
+                child: Text(
+                  'Updated today',
+                  style: const TextStyle(
+                      color: AppTheme.onSurfaceMuted, fontSize: 11),
+                ),
+              ),
+            ),
+          IconButton(
+            icon: const Icon(Icons.refresh, size: 20),
+            onPressed: () => _load(force: true),
+          ),
+        ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
           : RefreshIndicator(
               color: AppTheme.primary,
-              onRefresh: _load,
+              onRefresh: () => _load(force: true),
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 itemCount: _users.length,
@@ -62,33 +101,58 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   final rank = i + 1;
                   final isMe = user.id == currentId;
                   final badge = user.badge;
+                  final isTopThree = rank <= 3;
 
                   return GestureDetector(
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => ProfileScreen(userId: user.id)),
+                      MaterialPageRoute(
+                          builder: (_) => ProfileScreen(userId: user.id)),
                     ),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isMe
-                            ? AppTheme.primary.withValues(alpha: 0.12)
-                            : AppTheme.cardBg,
+                        gradient: isTopThree
+                            ? LinearGradient(
+                                colors: [
+                                  AppTheme.primary.withValues(alpha: isMe ? 0.25 : 0.12),
+                                  AppTheme.primary.withValues(alpha: isMe ? 0.15 : 0.06),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              )
+                            : null,
+                        color: isTopThree
+                            ? null
+                            : isMe
+                                ? AppTheme.primary.withValues(alpha: 0.12)
+                                : AppTheme.cardBg,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: isMe
-                              ? AppTheme.primary.withValues(alpha: 0.4)
-                              : const Color(0xFF1A2545),
+                          color: isTopThree
+                              ? AppTheme.primary.withValues(alpha: 0.5)
+                              : isMe
+                                  ? AppTheme.primary.withValues(alpha: 0.4)
+                                  : const Color(0xFF1A2545),
+                          width: isTopThree ? 1.5 : 1,
                         ),
+                        boxShadow: isTopThree
+                            ? [
+                                BoxShadow(
+                                  color: AppTheme.primary.withValues(alpha: 0.2),
+                                  blurRadius: 8,
+                                  spreadRadius: 0,
+                                ),
+                              ]
+                            : null,
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
-                            // Rank
                             SizedBox(
                               width: 36,
-                              child: rank <= 3
+                              child: isTopThree
                                   ? Text(
                                       ['🥇', '🥈', '🥉'][rank - 1],
                                       style: const TextStyle(fontSize: 22),
@@ -99,7 +163,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
-                                        color: isMe ? AppTheme.primary : AppTheme.onSurfaceMuted,
+                                        color: isMe
+                                            ? AppTheme.primary
+                                            : AppTheme.onSurfaceMuted,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -123,13 +189,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 15,
-                                          color: isMe ? AppTheme.primary : AppTheme.onSurface,
+                                          color: isTopThree || isMe
+                                              ? AppTheme.primary
+                                              : AppTheme.onSurface,
                                         ),
                                       ),
                                       if (isMe) ...[
                                         const SizedBox(width: 6),
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
                                             color: AppTheme.primary.withValues(alpha: 0.2),
                                             borderRadius: BorderRadius.circular(4),
@@ -149,10 +218,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                   const SizedBox(height: 2),
                                   Row(
                                     children: [
-                                      Text(
-                                        badge.emoji,
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
+                                      Text(badge.emoji,
+                                          style: const TextStyle(fontSize: 12)),
                                       const SizedBox(width: 4),
                                       Text(
                                         badge.name,
@@ -167,12 +234,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                 ],
                               ),
                             ),
-                            // Score
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 ShaderMask(
-                                  shaderCallback: (b) => AppTheme.gradient.createShader(b),
+                                  shaderCallback: (b) =>
+                                      AppTheme.gradient.createShader(b),
                                   child: Text(
                                     '${user.userScore}',
                                     style: const TextStyle(
@@ -184,7 +251,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                 ),
                                 const Text(
                                   'pts',
-                                  style: TextStyle(fontSize: 10, color: AppTheme.onSurfaceMuted),
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: AppTheme.onSurfaceMuted),
                                 ),
                               ],
                             ),

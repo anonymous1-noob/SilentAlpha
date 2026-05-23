@@ -33,6 +33,7 @@ dependencies:
   shared_preferences: ^2.3.5
   url_launcher: ^6.3.1
   flutter_svg: ^2.0.16
+  flutter_image_compress: ^2.3.0
 
   # Forms & Validation
   form_validator: ^2.1.1

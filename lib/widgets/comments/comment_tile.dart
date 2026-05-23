@@ -63,11 +63,7 @@ class CommentTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        comment.content,
-                        style: const TextStyle(
-                            color: AppTheme.onSurface, fontSize: 14, height: 1.4),
-                      ),
+                      _CommentText(content: comment.content),
                     ],
                   ),
                 ),
@@ -154,6 +150,43 @@ class CommentTile extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _CommentText extends StatelessWidget {
+  final String content;
+  const _CommentText({required this.content});
+
+  @override
+  Widget build(BuildContext context) {
+    final spans = <InlineSpan>[];
+    final regex = RegExp(r'@([a-z0-9_]+)', caseSensitive: false);
+    int last = 0;
+    for (final m in regex.allMatches(content)) {
+      if (m.start > last) {
+        spans.add(TextSpan(
+          text: content.substring(last, m.start),
+          style: const TextStyle(color: AppTheme.onSurface, fontSize: 14, height: 1.4),
+        ));
+      }
+      spans.add(TextSpan(
+        text: m.group(0),
+        style: const TextStyle(
+          color: AppTheme.primary,
+          fontSize: 14,
+          height: 1.4,
+          fontWeight: FontWeight.w600,
+        ),
+      ));
+      last = m.end;
+    }
+    if (last < content.length) {
+      spans.add(TextSpan(
+        text: content.substring(last),
+        style: const TextStyle(color: AppTheme.onSurface, fontSize: 14, height: 1.4),
+      ));
+    }
+    return RichText(text: TextSpan(children: spans));
   }
 }
 

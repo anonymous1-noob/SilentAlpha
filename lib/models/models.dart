@@ -34,6 +34,7 @@ class AppUser {
   final int userScore;
   final DateTime createdAt;
   final bool isFollowing;
+  final bool followRequestPending;
 
   final String role;
 
@@ -52,6 +53,7 @@ class AppUser {
     this.role = 'user',
     required this.createdAt,
     this.isFollowing = false,
+    this.followRequestPending = false,
   });
 
   UserBadge get badge => UserBadge.fromScore(userScore);
@@ -69,6 +71,7 @@ class AppUser {
         role: m['role'] as String? ?? 'user',
         createdAt: DateTime.tryParse(m['created_at'] as String? ?? '') ?? DateTime.now(),
         isFollowing: (m['is_following'] as bool?) ?? false,
+        followRequestPending: (m['follow_request_pending'] as bool?) ?? false,
       );
 
   AppUser copyWith({
@@ -80,6 +83,7 @@ class AppUser {
     int? followerCount,
     int? followingCount,
     bool? isFollowing,
+    bool? followRequestPending,
   }) =>
       AppUser(
         id: id,
@@ -94,6 +98,7 @@ class AppUser {
         role: role ?? this.role,
         createdAt: createdAt,
         isFollowing: isFollowing ?? this.isFollowing,
+        followRequestPending: followRequestPending ?? this.followRequestPending,
       );
 }
 
@@ -338,11 +343,12 @@ class Comment {
 
 // ── Notification ──────────────────────────────────────────────────────────────
 
-enum NotifType { rating, comment, follow, mention }
+enum NotifType { rating, comment, follow, mention, followRequest }
 
 class AppNotification {
   final String id;
   final NotifType type;
+  final String? actorId;
   final String actorHandle;
   final String? actorAvatarUrl;
   final String? postId;
@@ -353,6 +359,7 @@ class AppNotification {
   const AppNotification({
     required this.id,
     required this.type,
+    this.actorId,
     required this.actorHandle,
     this.actorAvatarUrl,
     this.postId,
@@ -364,6 +371,7 @@ class AppNotification {
   factory AppNotification.fromMap(Map<String, dynamic> m) => AppNotification(
         id: m['id'] as String,
         type: _parseType(m['type'] as String? ?? 'rating'),
+        actorId: m['actor_id'] as String?,
         actorHandle: m['actor_handle'] as String? ?? m['actor_username'] as String? ?? 'someone',
         actorAvatarUrl: m['actor_avatar_url'] as String?,
         postId: m['post_id'] as String?,
@@ -376,6 +384,7 @@ class AppNotification {
         'comment' => NotifType.comment,
         'follow' => NotifType.follow,
         'mention' => NotifType.mention,
+        'follow_request' => NotifType.followRequest,
         _ => NotifType.rating,
       };
 
@@ -383,7 +392,8 @@ class AppNotification {
         NotifType.rating => '@$actorHandle rated your post',
         NotifType.comment => '@$actorHandle commented on your post',
         NotifType.follow => '@$actorHandle started following you',
-        NotifType.mention => '@$actorHandle mentioned you',
+        NotifType.mention => '@$actorHandle mentioned you in a comment',
+        NotifType.followRequest => '@$actorHandle wants to follow you',
       };
 
   IconData get icon => switch (type) {
@@ -391,6 +401,7 @@ class AppNotification {
         NotifType.comment => Icons.chat_bubble,
         NotifType.follow => Icons.person_add,
         NotifType.mention => Icons.alternate_email,
+        NotifType.followRequest => Icons.person_add_outlined,
       };
 
   Color get iconColor => switch (type) {
@@ -398,6 +409,7 @@ class AppNotification {
         NotifType.comment => Colors.blueAccent,
         NotifType.follow => Colors.greenAccent,
         NotifType.mention => Colors.purpleAccent,
+        NotifType.followRequest => Colors.orangeAccent,
       };
 }
 

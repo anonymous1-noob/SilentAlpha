@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -110,18 +111,38 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final file = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1200,
-      maxHeight: 1200,
-      imageQuality: 85,
-    );
+    final file = await picker.pickImage(source: ImageSource.gallery);
     if (file == null) return;
-    final bytes = await file.readAsBytes();
+
+    final original = await file.readAsBytes();
+    const maxSizeBytes = 5 * 1024 * 1024; // 5 MB
+    if (original.length > maxSizeBytes) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image must be under 5 MB')),
+        );
+      }
+      return;
+    }
+
     final ext = file.name.split('.').last.toLowerCase();
+    // Compress to under 100 KB, iterating quality down until target is met
+    Uint8List compressed = original;
+    int quality = 60;
+    while (compressed.length > 100 * 1024 && quality >= 10) {
+      compressed = await FlutterImageCompress.compressWithList(
+        original,
+        minWidth: 800,
+        minHeight: 800,
+        quality: quality,
+        format: ext == 'png' ? CompressFormat.png : CompressFormat.jpeg,
+      );
+      quality -= 15;
+    }
+
     setState(() {
-      _imageBytes = bytes;
-      _imageExt = ext;
+      _imageBytes = compressed;
+      _imageExt = ext == 'png' ? 'png' : 'jpg';
     });
   }
 

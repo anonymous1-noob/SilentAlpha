@@ -110,6 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: (v) {
                       if (v == null || v.length < 3) return 'Min 3 characters';
                       if (!RegExp(r'^[a-z0-9_]+$').hasMatch(v)) return 'Only letters, numbers, underscores';
+                      if (v.toLowerCase() == 'anonymous') return '"anonymous" is a reserved handle';
                       return null;
                     },
                   ),
