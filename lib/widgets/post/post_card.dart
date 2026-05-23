@@ -292,6 +292,7 @@ class _PostCardState extends State<PostCard> {
               userId: widget.post.authorId,
               username: displayHandle ?? 'anon',
               radius: 20,
+              score: widget.post.authorScore,
             ),
           ),
         const SizedBox(width: 10),
