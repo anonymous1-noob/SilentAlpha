@@ -9,7 +9,7 @@ create extension if not exists "uuid-ossp";
 -- ── Profiles ─────────────────────────────────────────────────────────────────
 create table public.profiles (
   id           uuid primary key references auth.users(id) on delete cascade,
-  username     text not null unique,
+  handle       text not null unique,
   avatar_url   text,
   campus       text,
   bio          text,
@@ -188,7 +188,7 @@ create policy "Users can mark read"         on public.notifications for update u
 create or replace view public.posts_with_meta as
 select
   p.*,
-  pr.username   as author_username,
+  pr.handle     as author_handle,
   pr.avatar_url as author_avatar_url,
   c.name        as category_name,
   exists(
@@ -207,7 +207,7 @@ left join public.categories c on c.id = p.category_id;
 create or replace view public.comments_with_meta as
 select
   cm.*,
-  pr.username   as author_username,
+  pr.handle     as author_handle,
   pr.avatar_url as author_avatar_url,
   exists(
     select 1 from public.post_likes l
@@ -220,7 +220,7 @@ join public.profiles pr on pr.id = cm.author_id;
 create or replace view public.notifications_with_actor as
 select
   n.*,
-  pr.username   as actor_username,
+  pr.handle     as actor_handle,
   pr.avatar_url as actor_avatar_url
 from public.notifications n
 join public.profiles pr on pr.id = n.actor_id;
@@ -237,9 +237,8 @@ order by count desc;
 create or replace view public.profile_stats as
 select
   p.id,
-  p.username,
+  p.handle,
   p.avatar_url,
-  p.campus,
   p.bio,
   p.created_at,
   (select count(*) from public.follows f where f.following_id = p.id) as follower_count,

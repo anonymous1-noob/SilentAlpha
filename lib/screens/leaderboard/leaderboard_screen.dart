@@ -126,7 +126,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             ? null
                             : isMe
                                 ? AppTheme.primary.withValues(alpha: 0.12)
-                                : AppTheme.cardBg,
+                                : AppTheme.of(context).cardBg,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: isTopThree
@@ -165,7 +165,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                         fontWeight: FontWeight.w700,
                                         color: isMe
                                             ? AppTheme.primary
-                                            : AppTheme.onSurfaceMuted,
+                                            : AppTheme.of(context).onSurfaceMuted,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -191,7 +191,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                           fontSize: 15,
                                           color: isTopThree || isMe
                                               ? AppTheme.primary
-                                              : AppTheme.onSurface,
+                                              : AppTheme.of(context).onSurface,
                                         ),
                                       ),
                                       if (isMe) ...[
