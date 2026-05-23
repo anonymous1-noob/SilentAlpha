@@ -12,6 +12,7 @@
    - `db/schema.sql` — base tables, RLS policies, triggers, views
    - `db/migration_v7.sql` — edge_rank GREATEST guard (POWER crash fix)
    - `db/migration_v8.sql` — follow_requests table, profile_stats update, reserved handle
+   - `db/migration_v9.sql` — raise post content limit from 500 to 2000 chars
 
 ## 3. Environment Variables
 
