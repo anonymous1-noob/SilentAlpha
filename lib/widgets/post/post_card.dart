@@ -301,7 +301,7 @@ class _PostCardState extends State<PostCard> {
                 children: [
                   Flexible(
                     child: Text(
-                      showAnon ? 'Anonymous' : '@${displayHandle ?? 'anon'}',
+                      showAnon ? '@anonymous' : '@${displayHandle ?? 'anon'}',
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 14,

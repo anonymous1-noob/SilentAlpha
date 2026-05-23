@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import '../../providers/categories_provider.dart';
 import '../../providers/feed_provider.dart';
 import '../../utils/app_theme.dart';
 import '../../widgets/post/post_card.dart';
@@ -17,7 +16,6 @@ class FeedScreen extends StatefulWidget {
 class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateMixin {
   final _scrollCtrl = ScrollController();
   late TabController _tabCtrl;
-  String? _selectedCategoryId;
 
   @override
   void initState() {
@@ -46,7 +44,6 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final cats = context.watch<CategoriesProvider>().categories;
     final feed = context.watch<FeedProvider>();
 
     return Scaffold(
@@ -66,32 +63,17 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
               ),
             ),
             bottom: PreferredSize(
-              preferredSize: Size.fromHeight(
-                48.0 + (cats.isNotEmpty && _tabCtrl.index == 0 ? 52.0 : 0.0),
-              ),
-              child: Column(
-                children: [
-                  TabBar(
-                    controller: _tabCtrl,
-                    indicatorColor: AppTheme.primary,
-                    indicatorWeight: 3,
-                    labelColor: AppTheme.primary,
-                    unselectedLabelColor: AppTheme.onSurfaceMuted,
-                    labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                    tabs: const [
-                      Tab(text: 'All'),
-                      Tab(text: 'Following'),
-                    ],
-                  ),
-                  if (cats.isNotEmpty && _tabCtrl.index == 0)
-                    _CategoryChips(
-                      categories: cats,
-                      selectedId: _selectedCategoryId,
-                      onSelect: (id) {
-                        setState(() => _selectedCategoryId = _selectedCategoryId == id ? null : id);
-                        context.read<FeedProvider>().setFilters(categoryId: _selectedCategoryId);
-                      },
-                    ),
+              preferredSize: const Size.fromHeight(48.0),
+              child: TabBar(
+                controller: _tabCtrl,
+                indicatorColor: AppTheme.primary,
+                indicatorWeight: 3,
+                labelColor: AppTheme.primary,
+                unselectedLabelColor: AppTheme.onSurfaceMuted,
+                labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                tabs: const [
+                  Tab(text: 'All'),
+                  Tab(text: 'Following'),
                 ],
               ),
             ),
@@ -208,42 +190,3 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
   }
 }
 
-class _CategoryChips extends StatelessWidget {
-  final List<dynamic> categories;
-  final String? selectedId;
-  final void Function(String) onSelect;
-
-  const _CategoryChips({required this.categories, required this.selectedId, required this.onSelect});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 52,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        itemCount: categories.length,
-        itemBuilder: (_, i) {
-          final cat = categories[i];
-          final selected = selectedId == cat.id;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text('${cat.emoji ?? ''}  ${cat.name}'),
-              selected: selected,
-              onSelected: (_) => onSelect(cat.id),
-              backgroundColor: AppTheme.surface,
-              selectedColor: AppTheme.primary,
-              checkmarkColor: Colors.white,
-              labelStyle: TextStyle(
-                color: selected ? Colors.white : AppTheme.onSurface,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-                fontSize: 13,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
