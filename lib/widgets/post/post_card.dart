@@ -84,10 +84,13 @@ class _PostCardState extends State<PostCard> {
     final canModify = isOwner || isAdmin;
 
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => PostDetailScreen(post: widget.post)),
-      ),
+      onTap: widget.compact
+          ? () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => PostDetailScreen(post: widget.post)),
+              )
+          : null,
       onLongPress: isOwner ? () => _showAnalytics(context) : null,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
