@@ -58,7 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       final postRaw = results[1] as List<Map<String, dynamic>>;
       final rank = results[2] as int?;
       if (data != null) _profile = AppUser.fromMap(data);
-      _userPosts = postRaw.map(Post.fromMap).toList();
+      _userPosts = postRaw.map(Post.fromMap).where((p) => !p.isAnonymous).toList();
       _leaderboardRank = rank;
       if (_isOwn) {
         final savedRaw = await SupabaseService.getSavedPosts();
