@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/models.dart';
 
 class AvatarUtils {
   static final _colors = [
@@ -26,58 +25,46 @@ class AvatarUtils {
     return username.substring(0, username.length.clamp(1, 2)).toUpperCase();
   }
 
-  /// Builds an avatar circle. If [score] is provided, wraps with a coloured
-  /// badge ring and a tiny emoji indicator at the bottom-right corner.
+  static const _medalEmojis = ['🥇', '🥈', '🥉'];
+  static const _medalColors = [Color(0xFFFFD700), Color(0xFFC0C0C0), Color(0xFFCD7F32)];
+
+  /// Builds an avatar circle. If [rank] is 1–3, overlays the matching medal
+  /// emoji at the bottom-right. No decoration for rank > 3 or null.
   static Widget buildAvatar({
     String? url,
     required String userId,
     required String username,
     double radius = 20,
-    int? score,
+    int? rank,
   }) {
     final avatar = _buildCircle(url: url, userId: userId, username: username, radius: radius);
 
-    if (score == null) return avatar;
+    if (rank == null || rank > 3) return avatar;
 
-    final badge = UserBadge.fromScore(score);
-    final ringWidth = (radius * 0.12).clamp(2.0, 4.0);
-    final badgeSize = (radius * 0.62).clamp(14.0, 22.0);
+    final medalEmoji = _medalEmojis[rank - 1];
+    final medalColor = _medalColors[rank - 1];
+    final chipSize = (radius * 0.72).clamp(14.0, 24.0);
 
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Coloured ring
-        Container(
-          width: radius * 2 + ringWidth * 2,
-          height: radius * 2 + ringWidth * 2,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [badge.color, badge.color.withValues(alpha: 0.5)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Center(
-            child: ClipOval(child: SizedBox(width: radius * 2, height: radius * 2, child: avatar)),
-          ),
-        ),
-        // Badge emoji chip at bottom-right
+        avatar,
         Positioned(
-          bottom: -2,
-          right: -2,
+          bottom: -3,
+          right: -3,
           child: Container(
-            width: badgeSize,
-            height: badgeSize,
+            width: chipSize,
+            height: chipSize,
             decoration: BoxDecoration(
-              color: badge.color,
+              color: medalColor,
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 1.5),
+              boxShadow: [BoxShadow(color: medalColor.withValues(alpha: 0.5), blurRadius: 4)],
             ),
             child: Center(
               child: Text(
-                badge.emoji,
-                style: TextStyle(fontSize: badgeSize * 0.52),
+                medalEmoji,
+                style: TextStyle(fontSize: chipSize * 0.55),
               ),
             ),
           ),

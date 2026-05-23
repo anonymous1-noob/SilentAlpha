@@ -296,7 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   userId: widget.userId,
                   username: _profile?.handle ?? 'anon',
                   radius: 36,
-                  score: _profile?.userScore,
+                  rank: _leaderboardRank,
                 ),
                 const SizedBox(width: 16),
                 Expanded(

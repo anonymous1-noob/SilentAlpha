@@ -186,6 +186,7 @@ class Post {
   final String? authorHandle;
   final String? authorAvatarUrl;
   final int? authorScore;
+  final int? authorRank;
   final String content;
   final List<String> hashtags;
   final List<String> tickers;
@@ -211,6 +212,7 @@ class Post {
     this.authorHandle,
     this.authorAvatarUrl,
     this.authorScore,
+    this.authorRank,
     required this.content,
     this.hashtags = const [],
     this.tickers = const [],
@@ -237,6 +239,7 @@ class Post {
         authorHandle: m['author_handle'] as String?,
         authorAvatarUrl: m['author_avatar_url'] as String?,
         authorScore: m['author_score'] as int?,
+        authorRank: m['author_rank'] as int?,
         content: m['content'] as String? ?? '',
         hashtags: ((m['hashtags'] as List?)?.cast<String>()) ?? [],
         tickers: ((m['tickers'] as List?)?.cast<String>()) ?? [],
@@ -275,6 +278,7 @@ class Post {
         authorHandle: authorHandle,
         authorAvatarUrl: authorAvatarUrl,
         authorScore: authorScore,
+        authorRank: authorRank,
         content: content ?? this.content,
         hashtags: hashtags,
         tickers: tickers,
