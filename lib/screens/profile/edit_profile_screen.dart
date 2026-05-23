@@ -54,9 +54,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final bytes = await picked.readAsBytes();
       final ext = picked.name.split('.').last.toLowerCase();
-      final path = '${widget.user.id}.$ext';
-      await SupabaseService.uploadAvatar(path, bytes, ext);
-      final url = SupabaseService.getAvatarPublicUrl(path);
+      final mimeExt = ext == 'jpg' ? 'jpeg' : ext;
+      // Always store as .jpg so the path never changes between picks
+      final path = '${widget.user.id}.jpg';
+      await SupabaseService.uploadAvatar(path, bytes, mimeExt);
+      // Cache-bust so the app shows the new image immediately
+      final url =
+          '${SupabaseService.getAvatarPublicUrl(path)}?t=${DateTime.now().millisecondsSinceEpoch}';
       await context.read<AuthProvider>().updateProfile(avatarUrl: url);
       if (mounted) setState(() => _currentAvatarUrl = url);
     } catch (e) {
