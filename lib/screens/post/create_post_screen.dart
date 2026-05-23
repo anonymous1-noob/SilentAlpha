@@ -264,13 +264,54 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: GradientButton(
-              label: 'Publish',
-              loading: _sending,
-              width: 100,
-              onPressed: canPublish ? _publish : null,
-            ),
+            padding: const EdgeInsets.only(right: 12, top: 10, bottom: 10),
+            child: _sending
+                ? Container(
+                    width: 80,
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.gradient,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Center(
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      ),
+                    ),
+                  )
+                : GestureDetector(
+                    onTap: canPublish ? _publish : null,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        gradient: canPublish ? AppTheme.gradient : null,
+                        color: canPublish ? null : AppTheme.of(context).onSurfaceMuted.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.send_rounded,
+                            size: 15,
+                            color: canPublish ? Colors.white : AppTheme.of(context).onSurfaceMuted,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Post',
+                            style: TextStyle(
+                              color: canPublish ? Colors.white : AppTheme.of(context).onSurfaceMuted,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
           ),
         ],
       ),

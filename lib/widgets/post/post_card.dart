@@ -275,23 +275,22 @@ class _PostCardState extends State<PostCard> {
 
     return Row(
       children: [
-        GestureDetector(
-          onTap: showAnon
-              ? null
-              : () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => ProfileScreen(userId: widget.post.authorId)),
-                  ),
-          child: showAnon
-              ? _AnonAvatar()
-              : AvatarUtils.buildAvatar(
-                  url: widget.post.authorAvatarUrl,
-                  userId: widget.post.authorId,
-                  username: displayHandle ?? 'anon',
-                  radius: 20,
-                ),
-        ),
+        if (showAnon)
+          _AnonAvatar()
+        else
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => ProfileScreen(userId: widget.post.authorId)),
+            ),
+            child: AvatarUtils.buildAvatar(
+              url: widget.post.authorAvatarUrl,
+              userId: widget.post.authorId,
+              username: displayHandle ?? 'anon',
+              radius: 20,
+            ),
+          ),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -300,27 +299,34 @@ class _PostCardState extends State<PostCard> {
               Row(
                 children: [
                   Flexible(
-                    child: GestureDetector(
-                      onTap: showAnon
-                          ? null
-                          : () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => ProfileScreen(
-                                        userId: widget.post.authorId)),
+                    child: showAnon
+                        ? Text(
+                            '@anonymous',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              color: AppTheme.of(context).onSurfaceMuted,
+                              fontStyle: FontStyle.italic,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        : GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => ProfileScreen(
+                                      userId: widget.post.authorId)),
+                            ),
+                            child: Text(
+                              '@${displayHandle ?? 'anon'}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: AppTheme.of(context).onSurface,
                               ),
-                      child: Text(
-                        showAnon ? '@anonymous' : '@${displayHandle ?? 'anon'}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          color: showAnon ? AppTheme.of(context).onSurfaceMuted : AppTheme.of(context).onSurface,
-                          fontStyle: showAnon ? FontStyle.italic : FontStyle.normal,
-                          decoration: showAnon ? null : TextDecoration.none,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                   ),
                   if (isAdmin && !isOwner) ...[
                     const SizedBox(width: 4),
