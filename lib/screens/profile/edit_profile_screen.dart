@@ -19,7 +19,6 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  late final TextEditingController _handleCtrl;
   late final TextEditingController _taglineCtrl;
   late final TextEditingController _bioCtrl;
   bool _saving = false;
@@ -30,14 +29,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     _currentAvatarUrl = widget.user.avatarUrl;
-    _handleCtrl = TextEditingController(text: widget.user.handle);
     _taglineCtrl = TextEditingController(text: widget.user.tagline ?? '');
     _bioCtrl = TextEditingController(text: widget.user.bio ?? '');
   }
 
   @override
   void dispose() {
-    _handleCtrl.dispose();
     _taglineCtrl.dispose();
     _bioCtrl.dispose();
     super.dispose();
@@ -93,23 +90,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _save() async {
-    final handle = _handleCtrl.text.trim();
-    if (handle.length < 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Handle must be at least 3 characters')),
-      );
-      return;
-    }
-    if (!RegExp(r'^[a-z0-9_]+$').hasMatch(handle)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Handle: only lowercase letters, numbers, underscores')),
-      );
-      return;
-    }
     setState(() => _saving = true);
     try {
       await context.read<AuthProvider>().updateProfile(
-            handle: handle,
             tagline: _taglineCtrl.text.trim(),
             bio: _bioCtrl.text.trim(),
           );
@@ -221,24 +204,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               );
             }),
             const SizedBox(height: 32),
-            TextFormField(
-              controller: _handleCtrl,
-              decoration: InputDecoration(
-                labelText: 'Handle',
-                prefixText: '@',
-                prefixIcon: Icon(Icons.alternate_email, color: AppTheme.of(context).onSurfaceMuted),
-                helperText: 'Lowercase, letters/numbers/underscores only',
-                helperStyle: TextStyle(fontSize: 11),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: AppTheme.of(context).surfaceVariant,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppTheme.of(context).border),
               ),
-              onChanged: (v) {
-                final clean = v.toLowerCase().replaceAll(RegExp(r'[^a-z0-9_]'), '');
-                if (clean != v) {
-                  _handleCtrl.value = _handleCtrl.value.copyWith(
-                    text: clean,
-                    selection: TextSelection.collapsed(offset: clean.length),
-                  );
-                }
-              },
+              child: Row(
+                children: [
+                  Icon(Icons.alternate_email, size: 20, color: AppTheme.of(context).onSurfaceMuted),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Handle',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.of(context).onSurfaceMuted,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '@${widget.user.handle}',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: AppTheme.of(context).onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.lock_outline, size: 16, color: AppTheme.of(context).onSurfaceMuted),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             TextFormField(
