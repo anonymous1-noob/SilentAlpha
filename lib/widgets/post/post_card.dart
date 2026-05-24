@@ -243,14 +243,14 @@ class _PostCardState extends State<PostCard> {
           _AnonAvatar()
         else
           GestureDetector(
-            onTap: () => Navigator.push(
+            onTap: widget.post.authorId == null ? null : () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => ProfileScreen(userId: widget.post.authorId)),
+                  builder: (_) => ProfileScreen(userId: widget.post.authorId!)),
             ),
             child: AvatarUtils.buildAvatar(
               url: widget.post.authorAvatarUrl,
-              userId: widget.post.authorId,
+              userId: widget.post.authorId ?? '',
               username: displayHandle ?? 'anon',
               radius: 20,
               rank: widget.post.authorRank,
@@ -276,11 +276,11 @@ class _PostCardState extends State<PostCard> {
                             overflow: TextOverflow.ellipsis,
                           )
                         : GestureDetector(
-                            onTap: () => Navigator.push(
+                            onTap: widget.post.authorId == null ? null : () => Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (_) => ProfileScreen(
-                                      userId: widget.post.authorId)),
+                                      userId: widget.post.authorId!)),
                             ),
                             child: Text(
                               '@${displayHandle ?? 'anon'}',

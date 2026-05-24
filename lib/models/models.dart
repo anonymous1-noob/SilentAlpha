@@ -182,7 +182,7 @@ class Category {
 
 class Post {
   final String id;
-  final String authorId;
+  final String? authorId;
   final String? authorHandle;
   final String? authorAvatarUrl;
   final int? authorScore;
@@ -207,7 +207,7 @@ class Post {
 
   const Post({
     required this.id,
-    required this.authorId,
+    this.authorId,
     this.authorHandle,
     this.authorAvatarUrl,
     this.authorScore,
@@ -233,7 +233,7 @@ class Post {
 
   factory Post.fromMap(Map<String, dynamic> m) => Post(
         id: m['id'] as String,
-        authorId: m['author_id'] as String,
+        authorId: m['author_id'] as String?,
         authorHandle: m['author_handle'] as String?,
         authorAvatarUrl: m['author_avatar_url'] as String?,
         authorScore: m['author_score'] as int?,
