@@ -9,7 +9,6 @@ import '../../providers/categories_provider.dart';
 import '../../services/supabase_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/hashtag_utils.dart';
-import '../../utils/ticker_utils.dart';
 import '../../widgets/common/gradient_button.dart';
 
 class CreatePostScreen extends StatefulWidget {
@@ -31,8 +30,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   bool _sending = false;
   bool _isAnonymous = false;
   List<String> _hashtags = [];
-  List<String> _tickers = [];
-
   // Image
   Uint8List? _imageBytes;
   String? _imageExt;
@@ -64,12 +61,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   void _onContentChanged() {
     final text = _contentCtrl.text;
     final tags = HashtagUtils.extractNormalized(text);
-    final tickers = TickerUtils.extractNormalized(text);
-    if (tags.toString() != _hashtags.toString() ||
-        tickers.toString() != _tickers.toString()) {
+    if (tags.toString() != _hashtags.toString()) {
       setState(() {
         _hashtags = tags;
-        _tickers = tickers;
       });
     }
     _saveDraft(text);
@@ -210,7 +204,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       final postId = await SupabaseService.createPost({
         'content': text,
         'hashtags': _hashtags,
-        'tickers': _tickers,
         'is_anonymous': _isAnonymous,
         'category_id': _selectedCategoryId,
         if (imageUrl != null) 'image_url': imageUrl,
@@ -336,15 +329,15 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               maxLength: 2000,
               style: const TextStyle(fontSize: 16, height: 1.5),
               decoration: InputDecoration(
-                hintText: "What's your take? Use #hashtags and \$TICKERS.",
+                hintText: "What's your take? Use #hashtags.",
                 border: InputBorder.none,
                 counterStyle: TextStyle(color: AppTheme.of(context).onSurfaceMuted),
               ),
               onChanged: (_) => setState(() {}),
             ),
 
-            // Detected hashtags + tickers
-            if (_hashtags.isNotEmpty || _tickers.isNotEmpty) ...[
+            // Detected hashtags
+            if (_hashtags.isNotEmpty) ...[
               const SizedBox(height: 4),
               Wrap(
                 spacing: 6,
@@ -354,15 +347,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         label: Text('#$t'),
                         backgroundColor: AppTheme.primary.withValues(alpha: 0.15),
                         labelStyle: const TextStyle(color: AppTheme.primary, fontSize: 12),
-                        padding: EdgeInsets.zero,
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      )),
-                  ..._tickers.map((t) => Chip(
-                        label: Text('\$$t'),
-                        backgroundColor:
-                            const Color(0xFF22C55E).withValues(alpha: 0.15),
-                        labelStyle: const TextStyle(
-                            color: Color(0xFF22C55E), fontSize: 12),
                         padding: EdgeInsets.zero,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       )),

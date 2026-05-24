@@ -3,7 +3,6 @@ import '../../models/models.dart';
 import '../../services/supabase_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/hashtag_utils.dart';
-import '../../utils/ticker_utils.dart';
 import '../../widgets/common/gradient_button.dart';
 
 class EditPostScreen extends StatefulWidget {
@@ -38,7 +37,6 @@ class _EditPostScreenState extends State<EditPostScreen> {
       await SupabaseService.updatePost(widget.post.id, {
         'content': text,
         'hashtags': HashtagUtils.extractNormalized(text),
-        'tickers': TickerUtils.extractNormalized(text),
       });
       if (mounted) Navigator.pop(context);
     } catch (e) {

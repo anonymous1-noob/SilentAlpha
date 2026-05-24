@@ -41,8 +41,7 @@ class _FaqScreenState extends State<FaqScreen> {
         _Item(
           q: 'How do I create a post?',
           a: 'Tap the compose button (pencil icon) at the bottom of the feed. '
-              'Write your content, optionally add a category, hashtags, ticker symbols '
-              '(e.g. \$AAPL), or an image, then tap "Post".',
+              'Write your content, optionally add a category, hashtags, or an image, then tap "Post".',
         ),
         _Item(
           q: 'What is the character limit?',
@@ -66,10 +65,9 @@ class _FaqScreenState extends State<FaqScreen> {
               'Edited posts show an "edited" timestamp.',
         ),
         _Item(
-          q: 'What are hashtags and tickers?',
+          q: 'What are hashtags?',
           a: 'Add #hashtags to tag topics (e.g. #crypto, #earnings). '
-              'Add \$TICKER symbols to link to a ticker feed (e.g. \$TSLA). '
-              'Tapping either opens a filtered feed of related posts.',
+              'Tapping a hashtag opens a filtered feed of related posts.',
         ),
         _Item(
           q: 'What are polls?',

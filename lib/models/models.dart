@@ -189,7 +189,6 @@ class Post {
   final int? authorRank;
   final String content;
   final List<String> hashtags;
-  final List<String> tickers;
   final List<String> tags;
   final bool isAnonymous;
   final bool isPinned;
@@ -215,7 +214,6 @@ class Post {
     this.authorRank,
     required this.content,
     this.hashtags = const [],
-    this.tickers = const [],
     this.tags = const [],
     this.isAnonymous = false,
     this.isPinned = false,
@@ -242,7 +240,6 @@ class Post {
         authorRank: m['author_rank'] as int?,
         content: m['content'] as String? ?? '',
         hashtags: ((m['hashtags'] as List?)?.cast<String>()) ?? [],
-        tickers: ((m['tickers'] as List?)?.cast<String>()) ?? [],
         tags: ((m['tags'] as List?)?.cast<String>()) ?? [],
         isAnonymous: (m['is_anonymous'] as bool?) ?? false,
         isPinned: (m['is_pinned'] as bool?) ?? false,
@@ -281,7 +278,6 @@ class Post {
         authorRank: authorRank,
         content: content ?? this.content,
         hashtags: hashtags,
-        tickers: tickers,
         tags: tags,
         isAnonymous: isAnonymous,
         isPinned: isPinned ?? this.isPinned,

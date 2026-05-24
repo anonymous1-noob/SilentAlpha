@@ -6,14 +6,12 @@ import '../../providers/feed_provider.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/avatar_utils.dart';
 import '../../utils/hashtag_utils.dart';
-import '../../utils/ticker_utils.dart';
 import '../../utils/time_utils.dart';
 import '../../screens/post/post_detail_screen.dart';
 import '../../screens/post/edit_post_screen.dart';
 import '../../screens/post/post_analytics_sheet.dart';
 import '../../screens/profile/profile_screen.dart';
 import '../../screens/feed/hashtag_feed_screen.dart';
-import '../../screens/feed/ticker_feed_screen.dart';
 import '../../services/supabase_service.dart';
 import '../common/report_dialog.dart';
 import 'poll_widget.dart';
@@ -133,44 +131,6 @@ class _PostCardState extends State<PostCard> {
               const SizedBox(height: 12),
               _buildContent(context),
 
-              // Ticker chips
-              if (widget.post.tickers.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: widget.post.tickers
-                      .map((t) => GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => TickerFeedScreen(ticker: t)),
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 7, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF22C55E)
-                                    .withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: const Color(0xFF22C55E)
-                                      .withValues(alpha: 0.3),
-                                ),
-                              ),
-                              child: Text(
-                                '\$$t',
-                                style: const TextStyle(
-                                  color: Color(0xFF22C55E),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ))
-                      .toList(),
-                ),
-              ],
 
               if (widget.post.imageUrl != null) ...[
                 const SizedBox(height: 12),
@@ -477,24 +437,6 @@ class _PostCardState extends State<PostCard> {
         MaterialPageRoute(builder: (_) => HashtagFeedScreen(hashtag: tag)),
       ),
     );
-
-    // For content, use TickerUtils if tickers present, otherwise HashtagUtils
-    if (widget.post.tickers.isNotEmpty) {
-      return RichText(
-        text: TextSpan(
-          children: TickerUtils.buildRichSpans(
-            text,
-            baseStyle: base,
-            onTap: (t) => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => TickerFeedScreen(ticker: t)),
-            ),
-          ),
-        ),
-        maxLines: widget.compact ? 3 : null,
-        overflow: widget.compact ? TextOverflow.ellipsis : TextOverflow.clip,
-      );
-    }
 
     return RichText(
       text: TextSpan(children: hashSpans),

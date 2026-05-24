@@ -7,7 +7,6 @@ import '../../utils/app_theme.dart';
 import '../../utils/avatar_utils.dart';
 import '../../widgets/post/post_card.dart';
 import '../feed/hashtag_feed_screen.dart';
-import '../feed/ticker_feed_screen.dart';
 import '../profile/profile_screen.dart';
 
 class DiscoveryScreen extends StatefulWidget {
@@ -25,10 +24,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
   List<Post> _topPosts = [];
   List<Post> _postResults = [];
   List<AppUser> _userResults = [];
-  List<Map<String, dynamic>> _trendingTickers = [];
-
   bool _loadingTop = true;
-  bool _loadingTickers = true;
   bool _searching = false;
 
   @override
@@ -37,7 +33,6 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
     _tabCtrl = TabController(length: 2, vsync: this);
     _tabCtrl.addListener(() => setState(() {}));
     _loadTopPosts();
-    _loadTrendingTickers();
     _searchCtrl.addListener(_onSearchChanged);
   }
 
@@ -69,16 +64,6 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
     } catch (_) {
     } finally {
       if (mounted) setState(() => _loadingTop = false);
-    }
-  }
-
-  Future<void> _loadTrendingTickers() async {
-    try {
-      final raw = await SupabaseService.getTrendingTickers();
-      if (mounted) setState(() => _trendingTickers = raw);
-    } catch (_) {
-    } finally {
-      if (mounted) setState(() => _loadingTickers = false);
     }
   }
 
@@ -176,8 +161,6 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
                     topPosts: _topPosts,
                     loadingTop: _loadingTop,
                     trendingHashtags: trending,
-                    trendingTickers: _trendingTickers,
-                    loadingTickers: _loadingTickers,
                   ),
                   _PeopleTab(
                     isSearching: isSearching,
@@ -205,8 +188,6 @@ class _PostsTab extends StatelessWidget {
   final List<Post> topPosts;
   final bool loadingTop;
   final List<dynamic> trendingHashtags;
-  final List<Map<String, dynamic>> trendingTickers;
-  final bool loadingTickers;
 
   const _PostsTab({
     required this.isSearching,
@@ -216,8 +197,6 @@ class _PostsTab extends StatelessWidget {
     required this.topPosts,
     required this.loadingTop,
     required this.trendingHashtags,
-    required this.trendingTickers,
-    required this.loadingTickers,
   });
 
   @override
@@ -254,45 +233,6 @@ class _PostsTab extends StatelessWidget {
                       side: BorderSide(color: AppTheme.primary.withValues(alpha: 0.3)),
                       onPressed: () => Navigator.push(context,
                           MaterialPageRoute(builder: (_) => HashtagFeedScreen(hashtag: tag))),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-
-        // Trending Tickers
-        if (trendingTickers.isNotEmpty && !isSearching) ...[
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Text('📈 Trending Tickers',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 44,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: trendingTickers.length,
-                itemBuilder: (_, i) {
-                  final ticker = (trendingTickers[i]['ticker'] ?? '') as String;
-                  if (ticker.isEmpty) return const SizedBox.shrink();
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ActionChip(
-                      label: Text('\$$ticker',
-                          style: const TextStyle(
-                              color: Color(0xFF22C55E), fontWeight: FontWeight.w600)),
-                      backgroundColor: const Color(0xFF22C55E).withValues(alpha: 0.12),
-                      side: BorderSide(
-                          color: const Color(0xFF22C55E).withValues(alpha: 0.3)),
-                      onPressed: () => Navigator.push(context,
-                          MaterialPageRoute(
-                              builder: (_) => TickerFeedScreen(ticker: ticker))),
                     ),
                   );
                 },

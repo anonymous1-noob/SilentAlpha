@@ -53,7 +53,6 @@ class SupabaseService {
   static Future<List<Map<String, dynamic>>> getPosts({
     String? categoryId,
     String? hashtag,
-    String? ticker,
     String? authorId,
     int limit = 20,
     int offset = 0,
@@ -62,7 +61,6 @@ class SupabaseService {
     if (categoryId != null) query = query.eq('category_id', categoryId);
     if (authorId != null) query = query.eq('author_id', authorId);
     if (hashtag != null) query = query.contains('hashtags', [hashtag]);
-    if (ticker != null) query = query.contains('tickers', [ticker]);
     return await query
         .order('is_pinned', ascending: false)
         .order('edge_rank', ascending: false)
@@ -347,9 +345,6 @@ class SupabaseService {
 
   static Future<List<Map<String, dynamic>>> getTrendingHashtags() =>
       client.from('trending_hashtags').select().order('count', ascending: false).limit(10);
-
-  static Future<List<Map<String, dynamic>>> getTrendingTickers() =>
-      client.from('trending_tickers').select().order('count', ascending: false).limit(10);
 
   // ── Polls ─────────────────────────────────────────────────────────────────
 
