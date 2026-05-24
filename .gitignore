@@ -2,6 +2,12 @@
 .env
 .env.local
 
+# Dev/migration scripts (contain credentials — do not commit)
+run_migration.js
+run_migration_v11.js
+seed_data.js
+screen.png
+
 # Miscellaneous
 *.class
 *.log
