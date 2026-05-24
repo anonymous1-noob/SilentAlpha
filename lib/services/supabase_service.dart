@@ -290,7 +290,7 @@ class SupabaseService {
       client.from('profiles').select('id, handle, role, created_at').order('created_at', ascending: false);
 
   static Future<void> setUserRole(String userId, String role) =>
-      client.from('profiles').update({'role': role}).eq('id', userId);
+      client.rpc('set_user_role', params: {'p_user_id': userId, 'p_role': role});
 
   // ── Reports ───────────────────────────────────────────────────────────────
 
@@ -395,7 +395,7 @@ class SupabaseService {
   // ── Pin (admin) ───────────────────────────────────────────────────────────
 
   static Future<void> setPinned(String postId, bool pinned) =>
-      client.from('posts').update({'is_pinned': pinned}).eq('id', postId);
+      client.rpc('set_post_pinned', params: {'p_post_id': postId, 'p_pinned': pinned});
 
   // ── Leaderboard ───────────────────────────────────────────────────────────
 
@@ -428,5 +428,5 @@ class SupabaseService {
       client.from('reports').select('*, posts(*), comments(*)').eq('status', 'pending').order('created_at', ascending: false);
 
   static Future<void> resolveReport(String reportId, String action) =>
-      client.from('reports').update({'status': action}).eq('id', reportId);
+      client.rpc('resolve_report', params: {'p_report_id': reportId, 'p_action': action});
 }
