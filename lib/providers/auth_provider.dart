@@ -40,7 +40,9 @@ class AuthProvider extends ChangeNotifier {
         _user = AppUser.fromMap(data);
         notifyListeners();
       }
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('[AuthProvider] _loadProfile: $e\n$st');
+    }
   }
 
   Future<bool> signUp({
