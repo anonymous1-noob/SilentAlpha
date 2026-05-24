@@ -514,13 +514,18 @@ class _PostsList extends StatelessWidget {
         child: Text('No posts yet', style: TextStyle(color: AppTheme.of(context).onSurfaceMuted)),
       );
     }
-    return ListView.builder(
+    // Reuse the ambient FeedProvider rather than creating one per post.
+    // If no FeedProvider exists above (e.g. deep navigation), provide one.
+    final hasFeed = context.findAncestorWidgetOfExactType<ChangeNotifierProvider<FeedProvider>>() != null;
+    final list = ListView.builder(
       padding: const EdgeInsets.only(bottom: 80),
       itemCount: posts.length,
-      itemBuilder: (_, i) => ChangeNotifierProvider(
-        create: (_) => FeedProvider(),
-        child: PostCard(post: posts[i], compact: true),
-      ),
+      itemBuilder: (_, i) => PostCard(post: posts[i], compact: true),
+    );
+    if (hasFeed) return list;
+    return ChangeNotifierProvider(
+      create: (_) => FeedProvider(),
+      child: list,
     );
   }
 }

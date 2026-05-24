@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import '../models/models.dart';
 
 class SupabaseService {
   static SupabaseClient get client => Supabase.instance.client;
@@ -155,8 +156,17 @@ class SupabaseService {
 
   // ── Comments ──────────────────────────────────────────────────────────────
 
-  static Future<List<Map<String, dynamic>>> getComments(String postId) =>
-      client.from('comments_with_meta').select().eq('post_id', postId).order('created_at', ascending: true);
+  static Future<List<Map<String, dynamic>>> getComments(
+    String postId, {
+    int limit = 100,
+    int offset = 0,
+  }) =>
+      client
+          .from('comments_with_meta')
+          .select()
+          .eq('post_id', postId)
+          .order('created_at', ascending: true)
+          .range(offset, offset + limit - 1);
 
   static Future<void> addComment({
     required String postId,
@@ -284,8 +294,8 @@ class SupabaseService {
 
   // ── Admin ─────────────────────────────────────────────────────────────────
 
-  static Future<List<Map<String, dynamic>>> getAllUsers() =>
-      client.from('profiles').select('id, handle, role, created_at').order('created_at', ascending: false);
+  static Future<List<Map<String, dynamic>>> getAllUsers({int limit = 100, int offset = 0}) =>
+      client.from('profiles').select('id, handle, role, created_at').order('created_at', ascending: false).range(offset, offset + limit - 1);
 
   static Future<void> setUserRole(String userId, String role) =>
       client.rpc('set_user_role', params: {'p_user_id': userId, 'p_role': role});
@@ -375,6 +385,33 @@ class SupabaseService {
         'user_id': currentUserId!,
       });
 
+  static Future<Poll?> getPoll(String pollId) async {
+    final pollRow = await client.from('polls').select().eq('id', pollId).maybeSingle();
+    if (pollRow == null) return null;
+    final votes = await client
+        .from('poll_votes')
+        .select('option_index, user_id')
+        .eq('poll_id', pollId);
+    final options = ((pollRow['options'] as List?)?.cast<String>()) ?? [];
+    final countMap = <int, int>{};
+    int? userVote;
+    for (final v in votes) {
+      final idx = v['option_index'] as int;
+      countMap[idx] = (countMap[idx] ?? 0) + 1;
+      if (v['user_id'] == currentUserId) userVote = idx;
+    }
+    final results = List<Map<String, dynamic>>.generate(
+      options.length,
+      (i) => {'index': i, 'text': options[i], 'count': countMap[i] ?? 0},
+    );
+    return Poll.fromJson({
+      ...pollRow,
+      'total_votes': votes.length,
+      'user_vote': userVote,
+      'results': results,
+    });
+  }
+
   // ── Post Images ───────────────────────────────────────────────────────────
 
   static Future<void> uploadPostImage(String path, Uint8List bytes, String ext) =>
@@ -419,8 +456,8 @@ class SupabaseService {
 
   // ── Moderation Queue ──────────────────────────────────────────────────────
 
-  static Future<List<Map<String, dynamic>>> getModerationQueue() =>
-      client.from('reports').select('*, posts(*), comments(*)').eq('status', 'pending').order('created_at', ascending: false);
+  static Future<List<Map<String, dynamic>>> getModerationQueue({int limit = 50}) =>
+      client.from('reports').select('*, posts(*), comments(*)').eq('status', 'pending').order('created_at', ascending: false).limit(limit);
 
   static Future<void> resolveReport(String reportId, String action) =>
       client.rpc('resolve_report', params: {'p_report_id': reportId, 'p_action': action});

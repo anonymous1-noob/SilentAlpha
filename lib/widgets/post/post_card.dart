@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/models.dart';
@@ -448,12 +449,13 @@ class _PostCardState extends State<PostCard> {
   Widget _buildImage() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: Image.network(
-        widget.post.imageUrl!,
+      child: CachedNetworkImage(
+        imageUrl: widget.post.imageUrl!,
         height: 200,
         width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        memCacheHeight: 400,
+        errorWidget: (_, __, ___) => const SizedBox.shrink(),
       ),
     );
   }

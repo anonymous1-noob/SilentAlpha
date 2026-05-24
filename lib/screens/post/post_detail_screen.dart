@@ -10,6 +10,11 @@ import '../../utils/avatar_utils.dart';
 import '../../widgets/comments/comment_tile.dart';
 import '../../widgets/post/post_card.dart';
 
+// Compiled once; used to detect an active @mention at the cursor position.
+final _activeMentionRegex = RegExp(r'(?:^|[\s])@([a-z0-9_]*)$', caseSensitive: false);
+// Used when completing a mention to replace the partial @handle.
+final _completeMentionRegex = RegExp(r'@([a-z0-9_]*)$', caseSensitive: false);
+
 class PostDetailScreen extends StatefulWidget {
   final Post post;
   const PostDetailScreen({super.key, required this.post});
@@ -59,7 +64,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   // Extract partial @handle at end of current text (e.g. "@jo" → "jo")
   String? _extractActiveMention(String text) {
-    final match = RegExp(r'(?:^|[\s])@([a-z0-9_]*)$', caseSensitive: false).firstMatch(text);
+    final match = _activeMentionRegex.firstMatch(text);
     if (match == null) return null;
     return match.group(1)!;
   }
@@ -73,7 +78,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   void _completeMention(String handle) {
     final text = _commentCtrl.text;
-    final newText = text.replaceAll(RegExp(r'@([a-z0-9_]*)$', caseSensitive: false), '@$handle ');
+    final newText = text.replaceAll(_completeMentionRegex, '@$handle ');
     _commentCtrl.value = TextEditingValue(
       text: newText,
       selection: TextSelection.collapsed(offset: newText.length),

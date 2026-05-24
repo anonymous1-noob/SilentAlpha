@@ -160,9 +160,8 @@ class _CommentText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spans = <InlineSpan>[];
-    final regex = RegExp(r'@([a-z0-9_]+)', caseSensitive: false);
     int last = 0;
-    for (final m in regex.allMatches(content)) {
+    for (final m in _mentionRegex.allMatches(content)) {
       if (m.start > last) {
         spans.add(TextSpan(
           text: content.substring(last, m.start),
@@ -189,6 +188,9 @@ class _CommentText extends StatelessWidget {
     return RichText(text: TextSpan(children: spans));
   }
 }
+
+// Compiled once at startup, not per-build.
+final _mentionRegex = RegExp(r'@([a-z0-9_]+)', caseSensitive: false);
 
 class _VoteBtn extends StatelessWidget {
   final IconData icon;

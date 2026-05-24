@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/models.dart';
@@ -26,6 +27,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
   List<AppUser> _userResults = [];
   bool _loadingTop = true;
   bool _searching = false;
+  Timer? _searchDebounce;
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _tabCtrl.dispose();
     _searchCtrl.removeListener(_onSearchChanged);
     _searchCtrl.dispose();
@@ -54,7 +57,10 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
         _userResults = [];
       }
     });
-    if (q.length >= 2) _runSearch(q);
+    if (q.length >= 2) {
+      _searchDebounce?.cancel();
+      _searchDebounce = Timer(const Duration(milliseconds: 300), () => _runSearch(q));
+    }
   }
 
   Future<void> _loadTopPosts() async {
@@ -129,9 +135,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> with SingleTickerProv
                             )
                           : null,
                     ),
-                    onChanged: (_) {
-                      if (_activeQuery.length >= 2) _runSearch(_activeQuery);
-                    },
+                    onChanged: (_) {},
                   ),
                   const SizedBox(height: 12),
                   TabBar(

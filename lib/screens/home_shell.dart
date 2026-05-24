@@ -22,6 +22,8 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
+  // Track which tabs have been visited so we only build them on first access.
+  final Set<int> _visited = {0};
 
   @override
   void initState() {
@@ -62,9 +64,15 @@ class _HomeShellState extends State<HomeShell> {
 
     return Scaffold(
       backgroundColor: AppTheme.of(context).surface,
-      body: IndexedStack(
-        index: _index,
-        children: screens,
+      body: Stack(
+        children: [
+          for (int i = 0; i < screens.length; i++)
+            if (_visited.contains(i))
+              Offstage(
+                offstage: i != _index,
+                child: screens[i],
+              ),
+        ],
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
@@ -81,7 +89,10 @@ class _HomeShellState extends State<HomeShell> {
               if (i == 3 && unread > 0) {
                 context.read<NotificationProvider>().markAllRead();
               }
-              setState(() => _index = i);
+              setState(() {
+                _visited.add(i);
+                _index = i;
+              });
             }
           },
           items: [

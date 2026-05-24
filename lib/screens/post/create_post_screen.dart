@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -39,6 +40,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   DateTime? _pollDeadline;
 
   static const _draftKey = 'create_post_draft';
+  Timer? _draftTimer;
 
   @override
   void initState() {
@@ -49,6 +51,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   @override
   void dispose() {
+    _draftTimer?.cancel();
     _contentCtrl.removeListener(_onContentChanged);
     _contentCtrl.dispose();
     _pollQuestionCtrl.dispose();
@@ -66,7 +69,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         _hashtags = tags;
       });
     }
-    _saveDraft(text);
+    _draftTimer?.cancel();
+    _draftTimer = Timer(const Duration(milliseconds: 500), () => _saveDraft(text));
   }
 
   Future<void> _restoreDraft() async {

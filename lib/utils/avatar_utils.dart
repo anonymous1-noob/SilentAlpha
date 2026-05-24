@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class AvatarUtils {
@@ -82,7 +83,7 @@ class AvatarUtils {
     if (url != null && url.isNotEmpty) {
       return CircleAvatar(
         radius: radius,
-        backgroundImage: NetworkImage(url),
+        backgroundImage: CachedNetworkImageProvider(url),
         backgroundColor: colorFor(userId),
       );
     }

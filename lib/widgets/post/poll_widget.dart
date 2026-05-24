@@ -40,10 +40,9 @@ class _PollWidgetState extends State<PollWidget> {
       } else {
         await SupabaseService.votePoll(_poll.id, index);
       }
-      // Refresh the poll data
-      final postData = await SupabaseService.getPost(_getPostId());
-      if (postData != null && postData['poll'] != null && mounted) {
-        final updated = Poll.fromJson(postData['poll'] as Map<String, dynamic>);
+      // Fetch only poll data — avoids hitting the heavy posts_with_meta view.
+      final updated = await SupabaseService.getPoll(_poll.id);
+      if (updated != null && mounted) {
         setState(() => _poll = updated);
         widget.onVoted?.call(updated);
       }
@@ -52,8 +51,6 @@ class _PollWidgetState extends State<PollWidget> {
       if (mounted) setState(() => _voting = false);
     }
   }
-
-  String _getPostId() => widget.postId;
 
   @override
   Widget build(BuildContext context) {
