@@ -347,7 +347,7 @@ class Comment {
 
 // ── Notification ──────────────────────────────────────────────────────────────
 
-enum NotifType { rating, comment, follow, mention, followRequest }
+enum NotifType { rating, comment, follow, mention, followRequest, newPost }
 
 class AppNotification {
   final String id;
@@ -389,16 +389,22 @@ class AppNotification {
         'follow' => NotifType.follow,
         'mention' => NotifType.mention,
         'follow_request' => NotifType.followRequest,
+        'new_post' => NotifType.newPost,
         _ => NotifType.rating,
       };
 
-  String get label => switch (type) {
-        NotifType.rating => '@$actorHandle rated your post',
-        NotifType.comment => '@$actorHandle commented on your post',
-        NotifType.follow => '@$actorHandle started following you',
-        NotifType.mention => '@$actorHandle mentioned you in a comment',
-        NotifType.followRequest => '@$actorHandle wants to follow you',
-      };
+  String get label {
+    return switch (type) {
+      NotifType.rating => '@$actorHandle rated your post',
+      NotifType.comment => '@$actorHandle commented on your post',
+      NotifType.follow => '@$actorHandle started following you',
+      NotifType.mention => '@$actorHandle mentioned you in a comment',
+      NotifType.followRequest => '@$actorHandle wants to follow you',
+      NotifType.newPost => body != null && body!.isNotEmpty
+          ? '@$actorHandle posted: ${body!.length > 80 ? '${body!.substring(0, 80)}…' : body!}'
+          : '@$actorHandle shared a new post',
+    };
+  }
 
   IconData get icon => switch (type) {
         NotifType.rating => Icons.star,
@@ -406,6 +412,7 @@ class AppNotification {
         NotifType.follow => Icons.person_add,
         NotifType.mention => Icons.alternate_email,
         NotifType.followRequest => Icons.person_add_outlined,
+        NotifType.newPost => Icons.article_outlined,
       };
 
   Color get iconColor => switch (type) {
@@ -414,6 +421,7 @@ class AppNotification {
         NotifType.follow => Colors.greenAccent,
         NotifType.mention => Colors.purpleAccent,
         NotifType.followRequest => Colors.orangeAccent,
+        NotifType.newPost => Colors.tealAccent,
       };
 }
 

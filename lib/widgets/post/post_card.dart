@@ -30,6 +30,7 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   late double _slider;
   bool _dragging = false;
+  bool _contentExpanded = false;
 
   @override
   void initState() {
@@ -83,13 +84,6 @@ class _PostCardState extends State<PostCard> {
     final canModify = isOwner || isAdmin;
 
     return GestureDetector(
-      onTap: widget.compact
-          ? () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => PostDetailScreen(post: widget.post)),
-              )
-          : null,
       onLongPress: isOwner ? () => _showAnalytics(context) : null,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -147,7 +141,10 @@ class _PostCardState extends State<PostCard> {
                 ),
               ],
 
-              if (!widget.compact) ...[
+              if (widget.compact) ...[
+                const SizedBox(height: 10),
+                _buildCompactFooter(context, feed),
+              ] else ...[
                 const SizedBox(height: 14),
                 _buildRatingSlider(feed),
                 const SizedBox(height: 10),
@@ -429,20 +426,131 @@ class _PostCardState extends State<PostCard> {
 
   Widget _buildContent(BuildContext context) {
     final base = TextStyle(color: AppTheme.of(context).onSurface, fontSize: 15, height: 1.5);
-    final text = widget.post.content;
     final hashSpans = HashtagUtils.buildRichSpans(
-      text,
+      widget.post.content,
       baseStyle: base,
       onTap: (tag) => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => HashtagFeedScreen(hashtag: tag)),
       ),
     );
+    final collapseLines = widget.compact ? 3 : 5;
 
-    return RichText(
-      text: TextSpan(children: hashSpans),
-      maxLines: widget.compact ? 3 : null,
-      overflow: widget.compact ? TextOverflow.ellipsis : TextOverflow.clip,
+    return LayoutBuilder(
+      builder: (ctx, constraints) {
+        // TextPainter doesn't support WidgetSpan (used by hashtags), so measure
+        // overflow using plain text. The approximation is close enough for
+        // deciding whether to show "more".
+        final tp = TextPainter(
+          text: TextSpan(text: widget.post.content, style: base),
+          maxLines: collapseLines,
+          textDirection: TextDirection.ltr,
+        )..layout(maxWidth: constraints.maxWidth);
+        final overflows = tp.didExceedMaxLines;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: overflows && !_contentExpanded
+                  ? () => setState(() => _contentExpanded = true)
+                  : null,
+              child: RichText(
+                text: TextSpan(children: hashSpans),
+                maxLines: _contentExpanded ? null : collapseLines,
+                overflow: _contentExpanded ? TextOverflow.clip : TextOverflow.ellipsis,
+              ),
+            ),
+            if (overflows && !_contentExpanded)
+              GestureDetector(
+                onTap: () => setState(() => _contentExpanded = true),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    'more',
+                    style: TextStyle(
+                      color: AppTheme.of(context).onSurfaceMuted,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            if (_contentExpanded)
+              GestureDetector(
+                onTap: () => setState(() => _contentExpanded = false),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    'less',
+                    style: TextStyle(
+                      color: AppTheme.of(context).onSurfaceMuted,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCompactFooter(BuildContext context, FeedProvider feed) {
+    final post = widget.post;
+    final avgLabel = post.avgRating > 0
+        ? '+${post.avgRating.toStringAsFixed(1)}'
+        : post.avgRating < 0
+            ? post.avgRating.toStringAsFixed(1)
+            : null;
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => PostDetailScreen(post: post)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.chat_bubble_outline, size: 16,
+                  color: AppTheme.of(context).onSurfaceMuted),
+              if (post.commentCount > 0) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '${post.commentCount}',
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: AppTheme.of(context).onSurfaceMuted),
+                ),
+              ],
+            ],
+          ),
+        ),
+        if (avgLabel != null) ...[
+          const SizedBox(width: 12),
+          Icon(Icons.star_rounded, size: 14, color: _sliderColor(post.avgRating)),
+          const SizedBox(width: 2),
+          Text(
+            avgLabel,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: _sliderColor(post.avgRating),
+            ),
+          ),
+        ],
+        const Spacer(),
+        GestureDetector(
+          onTap: () => feed.toggleSaved(post.id, currentlySaved: post.isSaved),
+          child: Icon(
+            post.isSaved ? Icons.bookmark : Icons.bookmark_border,
+            size: 18,
+            color: post.isSaved
+                ? AppTheme.primary
+                : AppTheme.of(context).onSurfaceMuted,
+          ),
+        ),
+      ],
     );
   }
 
@@ -516,7 +624,7 @@ class _PostCardState extends State<PostCard> {
             ),
           ),
         GestureDetector(
-          onTap: () => feed.toggleSaved(post.id),
+          onTap: () => feed.toggleSaved(post.id, currentlySaved: post.isSaved),
           child: Icon(
             post.isSaved ? Icons.bookmark : Icons.bookmark_border,
             color: post.isSaved ? AppTheme.primary : AppTheme.onSurfaceMuted,

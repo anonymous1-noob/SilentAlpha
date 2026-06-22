@@ -121,7 +121,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ],
       ),
     );
-    if (confirm == true && mounted) await context.read<AuthProvider>().signOut();
+    if (confirm == true && mounted) {
+      await context.read<AuthProvider>().signOut();
+      if (mounted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    }
   }
 
   @override

@@ -54,13 +54,13 @@ class _ModerationScreenState extends State<ModerationScreen> {
               child: CircularProgressIndicator(
                   color: AppTheme.primary))
           : _reports.isEmpty
-              ? const Center(
+              ? Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.check_circle_outline,
+                      const Icon(Icons.check_circle_outline,
                           size: 64, color: Colors.green),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Text(
                         'Queue is clear!',
                         style:
@@ -143,7 +143,7 @@ class _ModerationScreenState extends State<ModerationScreen> {
                                     style: OutlinedButton.styleFrom(
                                       foregroundColor:
                                           AppTheme.onSurfaceMuted,
-                                      side: const BorderSide(
+                                      side: BorderSide(
                                           color: AppTheme.of(context).onSurfaceMuted),
                                     ),
                                     child: const Text('Dismiss'),

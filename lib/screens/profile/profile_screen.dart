@@ -35,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 2, vsync: this);
+    _tabs = TabController(length: _isOwn ? 2 : 1, vsync: this);
     _load();
   }
 
@@ -72,7 +72,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             .whereType<Post>()
             .toList();
       }
-    } catch (_) {
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load profile: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -399,7 +404,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       dividerColor: Colors.transparent,
       tabs: [
         const Tab(text: 'Posts'),
-        if (_isOwn) const Tab(text: 'Saved') else const Tab(text: ''),
+        if (_isOwn) const Tab(text: 'Saved'),
       ],
     );
   }
@@ -409,7 +414,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       controller: _tabs,
       children: [
         _PostsList(posts: _userPosts),
-        if (_isOwn) _PostsList(posts: _savedPosts) else const SizedBox.shrink(),
+        if (_isOwn) _PostsList(posts: _savedPosts),
       ],
     );
   }

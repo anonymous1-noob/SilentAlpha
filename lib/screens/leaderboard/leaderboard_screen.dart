@@ -7,7 +7,8 @@ import '../../utils/avatar_utils.dart';
 import '../profile/profile_screen.dart';
 
 class LeaderboardScreen extends StatefulWidget {
-  const LeaderboardScreen({super.key});
+  final VoidCallback? onClose;
+  const LeaderboardScreen({super.key, this.onClose});
 
   @override
   State<LeaderboardScreen> createState() => _LeaderboardScreenState();
@@ -55,14 +56,146 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     }
   }
 
+  Widget _buildMyRankBanner(BuildContext context, AppUser me, int rank) {
+    final badge = me.badge;
+    final isTopThree = rank <= 3;
+    final rankLabel = isTopThree ? ['🥇', '🥈', '🥉'][rank - 1] : '#$rank';
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primary.withValues(alpha: 0.25),
+            AppTheme.primary.withValues(alpha: 0.10),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppTheme.primary.withValues(alpha: 0.5),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(
+            rankLabel,
+            style: isTopThree
+                ? const TextStyle(fontSize: 22)
+                : TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primary,
+                  ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(width: 12),
+          AvatarUtils.buildAvatar(
+            url: me.avatarUrl,
+            userId: me.id,
+            username: me.handle,
+            radius: 22,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '@${me.handle}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        color: AppTheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'you',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: AppTheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Text(badge.emoji,
+                        style: const TextStyle(fontSize: 12)),
+                    const SizedBox(width: 4),
+                    Text(
+                      badge.name,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: badge.color,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              ShaderMask(
+                shaderCallback: (b) => AppTheme.gradient.createShader(b),
+                child: Text(
+                  '${me.userScore}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Text(
+                'pts',
+                style: TextStyle(
+                    fontSize: 10,
+                    color: AppTheme.of(context).onSurfaceMuted),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentId = SupabaseService.currentUserId;
+    final myIndex = _users.indexWhere((u) => u.id == currentId);
+    final myUser = myIndex >= 0 ? _users[myIndex] : null;
+    final myRank = myIndex >= 0 ? myIndex + 1 : null;
 
     return Scaffold(
       backgroundColor: AppTheme.of(context).surface,
       appBar: AppBar(
         backgroundColor: AppTheme.of(context).surfaceVariant,
+        automaticallyImplyLeading: widget.onClose != null,
+        leading: widget.onClose != null
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: widget.onClose,
+              )
+            : null,
         title: ShaderMask(
           shaderCallback: (b) => AppTheme.gradient.createShader(b),
           child: const Text(
@@ -95,10 +228,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               onRefresh: () => _load(force: true),
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                itemCount: _users.length,
+                // Extra item at top = current user rank banner (if found)
+                itemCount: _users.length + (myUser != null ? 1 : 0),
                 itemBuilder: (context, i) {
-                  final user = _users[i];
-                  final rank = i + 1;
+                  // Item 0 is the pinned "my rank" banner when user is in list
+                  if (myUser != null && i == 0) {
+                    return _buildMyRankBanner(context, myUser, myRank!);
+                  }
+                  final idx = myUser != null ? i - 1 : i;
+                  final user = _users[idx];
+                  final rank = idx + 1;
                   final isMe = user.id == currentId;
                   final badge = user.badge;
                   final isTopThree = rank <= 3;

@@ -10,7 +10,6 @@ import '../../providers/categories_provider.dart';
 import '../../services/supabase_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/hashtag_utils.dart';
-import '../../widgets/common/gradient_button.dart';
 
 class CreatePostScreen extends StatefulWidget {
   const CreatePostScreen({super.key});
@@ -225,6 +224,14 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           options: options,
           deadline: _pollDeadline,
         );
+      }
+
+      // Notify followers (only for non-anonymous posts)
+      if (!_isAnonymous) {
+        SupabaseService.notifyFollowersOfNewPost(
+          postId: postId,
+          content: text,
+        ).ignore();
       }
 
       await _clearDraft();
