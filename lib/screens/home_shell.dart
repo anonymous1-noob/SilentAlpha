@@ -22,6 +22,7 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
+  bool _showLeaderboard = false;
   // Track which tabs have been visited so we only build them on first access.
   final Set<int> _visited = {0};
 
@@ -72,6 +73,10 @@ class _HomeShellState extends State<HomeShell> {
                 offstage: i != _index,
                 child: screens[i],
               ),
+          if (_showLeaderboard)
+            LeaderboardScreen(
+              onClose: () => setState(() => _showLeaderboard = false),
+            ),
         ],
       ),
       bottomNavigationBar: Container(
@@ -92,6 +97,7 @@ class _HomeShellState extends State<HomeShell> {
               setState(() {
                 _visited.add(i);
                 _index = i;
+                _showLeaderboard = false;
               });
             }
           },
@@ -123,15 +129,12 @@ class _HomeShellState extends State<HomeShell> {
           ],
         ),
       ),
-      floatingActionButton: _index == 0
+      floatingActionButton: _index == 0 && !_showLeaderboard
           ? FloatingActionButton.small(
               heroTag: 'leaderboard',
               backgroundColor: AppTheme.of(context).surfaceVariant,
               foregroundColor: AppTheme.primary,
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
-              ),
+              onPressed: () => setState(() => _showLeaderboard = true),
               child: const Icon(Icons.leaderboard_outlined, size: 20),
             )
           : null,

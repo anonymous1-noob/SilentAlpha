@@ -272,6 +272,31 @@ class SupabaseService {
     });
   }
 
+  static Future<void> notifyFollowersOfNewPost({
+    required String postId,
+    required String content,
+  }) async {
+    final uid = currentUserId;
+    if (uid == null) return;
+    final followers = await client
+        .from('follows')
+        .select('follower_id')
+        .eq('following_id', uid);
+    if (followers.isEmpty) return;
+    final preview = content.length > 100 ? content.substring(0, 100) : content;
+    await client.from('notifications').insert(
+      (followers as List).map((f) => {
+        'type': 'new_post',
+        'recipient_id': f['follower_id'] as String,
+        'actor_id': uid,
+        'post_id': postId,
+        'body': preview,
+        'read': false,
+        'created_at': DateTime.now().toUtc().toIso8601String(),
+      }).toList(),
+    );
+  }
+
   // ── Categories ────────────────────────────────────────────────────────────
 
   static Future<List<Map<String, dynamic>>> getCategories() =>

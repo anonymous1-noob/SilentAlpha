@@ -139,7 +139,11 @@ class FeedProvider extends ChangeNotifier {
 
   Future<void> ratePost(String postId, int value) async {
     final idx = _posts.indexWhere((p) => p.id == postId);
-    if (idx < 0) return;
+    if (idx < 0) {
+      // Post not in current feed (e.g. from Discovery or profile) — persist anyway.
+      try { await SupabaseService.ratePost(postId, value); } catch (_) {}
+      return;
+    }
     final post = _posts[idx];
     final prevRating = post.userRating;
 
@@ -179,9 +183,13 @@ class FeedProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleSaved(String postId) async {
+  Future<void> toggleSaved(String postId, {required bool currentlySaved}) async {
     final idx = _posts.indexWhere((p) => p.id == postId);
-    if (idx < 0) return;
+    if (idx < 0) {
+      // Post not in current feed (e.g. from Discovery or profile) — persist anyway.
+      try { await SupabaseService.toggleSaved(postId, currentlySaved); } catch (_) {}
+      return;
+    }
     final post = _posts[idx];
     _posts[idx] = post.copyWith(isSaved: !post.isSaved);
     notifyListeners();

@@ -6,6 +6,7 @@ import '../utils/app_theme.dart';
 import '../utils/avatar_utils.dart';
 import '../utils/time_utils.dart';
 import 'profile/profile_screen.dart';
+import 'post/post_detail_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -32,7 +33,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       final raw = await SupabaseService.getNotifications();
       _notifs = raw.map(AppNotification.fromMap).toList();
       await SupabaseService.markNotificationsRead();
-    } catch (_) {
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load notifications: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -157,15 +163,30 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 ),
                               ),
                               title: GestureDetector(
-                                onTap: n.actorId != null
-                                    ? () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => ProfileScreen(
-                                                userId: n.actorId!),
-                                          ),
-                                        )
-                                    : null,
+                                onTap: () async {
+                                  if (n.type == NotifType.newPost &&
+                                      n.postId != null) {
+                                    final raw = await SupabaseService.getPost(
+                                        n.postId!);
+                                    if (raw != null && context.mounted) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => PostDetailScreen(
+                                              post: Post.fromMap(raw)),
+                                        ),
+                                      );
+                                    }
+                                  } else if (n.actorId != null) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            ProfileScreen(userId: n.actorId!),
+                                      ),
+                                    );
+                                  }
+                                },
                                 child: Text(
                                   n.label,
                                   style: TextStyle(
