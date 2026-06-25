@@ -137,7 +137,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             child: ListView(
               padding: const EdgeInsets.only(bottom: 16),
               children: [
-                PostCard(post: widget.post, compact: false),
+                PostCard(post: widget.post, compact: false, allowDetailNavigation: false),
                 const Divider(),
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 12, 16, 8),

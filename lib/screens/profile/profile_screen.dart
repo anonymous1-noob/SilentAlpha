@@ -224,8 +224,33 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               color: AppTheme.of(context).surfaceVariant,
               onSelected: (v) async {
                 if (v == 'block') {
-                  await SupabaseService.blockUser(widget.userId);
-                  if (context.mounted) Navigator.pop(context);
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: AppTheme.of(context).surfaceVariant,
+                      title: const Text('Block user?'),
+                      content: const Text(
+                          "You won't see their posts anymore. They won't know they've been blocked."),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Block',
+                              style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirm == true && context.mounted) {
+                    await SupabaseService.blockUser(widget.userId);
+                    if (context.mounted) {
+                      context.read<FeedProvider>().removePostsByAuthor(widget.userId);
+                      Navigator.pop(context);
+                    }
+                  }
                 }
               },
               itemBuilder: (_) => [
