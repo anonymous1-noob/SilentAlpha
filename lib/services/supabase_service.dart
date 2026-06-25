@@ -341,6 +341,15 @@ class SupabaseService {
         'created_at': DateTime.now().toIso8601String(),
       });
 
+  // ── Hidden Posts (Not Interested) ────────────────────────────────────────
+
+  static Future<void> hidePost(String postId) =>
+      client.from('hidden_posts').upsert({
+        'user_id': currentUserId!,
+        'post_id': postId,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+
   // ── Block ─────────────────────────────────────────────────────────────────
 
   static Future<void> blockUser(String targetId) =>

@@ -396,7 +396,9 @@ class AppNotification {
   String get label {
     return switch (type) {
       NotifType.rating => '@$actorHandle rated your post',
-      NotifType.comment => '@$actorHandle commented on your post',
+      NotifType.comment => body != null && body!.isNotEmpty
+          ? '@$actorHandle: "${body!.length > 60 ? '${body!.substring(0, 60)}…' : body!}"'
+          : '@$actorHandle commented on your post',
       NotifType.follow => '@$actorHandle started following you',
       NotifType.mention => '@$actorHandle mentioned you in a comment',
       NotifType.followRequest => '@$actorHandle wants to follow you',

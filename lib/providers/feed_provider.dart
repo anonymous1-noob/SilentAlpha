@@ -213,6 +213,19 @@ class FeedProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> hidePost(String postId) async {
+    _posts.removeWhere((p) => p.id == postId);
+    notifyListeners();
+    try {
+      await SupabaseService.hidePost(postId);
+    } catch (_) {}
+  }
+
+  void removePostsByAuthor(String authorId) {
+    _posts.removeWhere((p) => p.authorId == authorId);
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _teardownRealtime();

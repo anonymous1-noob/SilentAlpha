@@ -76,7 +76,7 @@ class _ReportDialogState extends State<ReportDialog> {
                     reason: _selected!,
                   );
                   if (context.mounted) {
-                    Navigator.pop(context);
+                    Navigator.pop(context, true);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Report submitted')),
                     );

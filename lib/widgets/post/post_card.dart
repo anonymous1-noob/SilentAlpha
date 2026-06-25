@@ -20,8 +20,16 @@ import 'poll_widget.dart';
 class PostCard extends StatefulWidget {
   final Post post;
   final bool compact;
+  /// When false the comment icon doesn't push a new PostDetailScreen.
+  /// Set to false when PostCard is embedded inside PostDetailScreen.
+  final bool allowDetailNavigation;
 
-  const PostCard({super.key, required this.post, this.compact = false});
+  const PostCard({
+    super.key,
+    required this.post,
+    this.compact = false,
+    this.allowDetailNavigation = true,
+  });
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -31,6 +39,7 @@ class _PostCardState extends State<PostCard> {
   late double _slider;
   bool _dragging = false;
   bool _contentExpanded = false;
+  bool _navigating = false;
 
   @override
   void initState() {
@@ -72,6 +81,26 @@ class _PostCardState extends State<PostCard> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => PostAnalyticsSheet(post: widget.post),
+    );
+  }
+
+  Future<void> _goToDetail(BuildContext context, Post post) async {
+    if (!widget.allowDetailNavigation || _navigating) return;
+    setState(() => _navigating = true);
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => PostDetailScreen(post: post)),
+    );
+    if (mounted) setState(() => _navigating = false);
+  }
+
+  void _showFullscreenImage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => _FullscreenImageScreen(imageUrl: widget.post.imageUrl!),
+      ),
     );
   }
 
@@ -353,10 +382,37 @@ class _PostCardState extends State<PostCard> {
             } catch (_) {}
           case 'analytics':
             _showAnalytics(context);
+          case 'not_interested':
+            if (mounted) feed.hidePost(widget.post.id);
+          case 'block':
+            final confirm = await showDialog<bool>(
+              context: context,
+              builder: (_) => AlertDialog(
+                backgroundColor: AppTheme.of(context).surfaceVariant,
+                title: const Text('Block user?'),
+                content: const Text(
+                    "You won't see their posts anymore. They won't know they've been blocked."),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancel')),
+                  TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Block',
+                          style: TextStyle(color: Colors.red))),
+                ],
+              ),
+            );
+            if (confirm == true && mounted) {
+              await SupabaseService.blockUser(widget.post.authorId!);
+              if (mounted) feed.removePostsByAuthor(widget.post.authorId!);
+            }
           case 'report':
-            showDialog(
-                context: context,
-                builder: (_) => ReportDialog(postId: widget.post.id));
+            final submitted = await showDialog<bool>(
+              context: context,
+              builder: (_) => ReportDialog(postId: widget.post.id),
+            );
+            if (submitted == true && mounted) feed.hidePost(widget.post.id);
         }
       },
       itemBuilder: (_) => [
@@ -407,7 +463,24 @@ class _PostCardState extends State<PostCard> {
               ]),
             ),
         ],
-        if (!isOwner)
+        if (!isOwner) ...[
+          const PopupMenuItem(
+            value: 'not_interested',
+            child: Row(children: [
+              Icon(Icons.not_interested, size: 16),
+              SizedBox(width: 8),
+              Text('Not interested'),
+            ]),
+          ),
+          if (!widget.post.isAnonymous && widget.post.authorId != null)
+            const PopupMenuItem(
+              value: 'block',
+              child: Row(children: [
+                Icon(Icons.block, size: 16, color: Colors.red),
+                SizedBox(width: 8),
+                Text('Block user', style: TextStyle(color: Colors.red)),
+              ]),
+            ),
           const PopupMenuItem(
             value: 'report',
             child: Row(children: [
@@ -416,6 +489,7 @@ class _PostCardState extends State<PostCard> {
               Text('Report'),
             ]),
           ),
+        ],
       ],
     );
   }
@@ -506,10 +580,7 @@ class _PostCardState extends State<PostCard> {
     return Row(
       children: [
         GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => PostDetailScreen(post: post)),
-          ),
+          onTap: () => _goToDetail(context, post),
           child: Row(
             children: [
               Icon(Icons.chat_bubble_outline, size: 16,
@@ -555,15 +626,18 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildImage() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: CachedNetworkImage(
-        imageUrl: widget.post.imageUrl!,
-        height: 200,
-        width: double.infinity,
-        fit: BoxFit.cover,
-        memCacheHeight: 400,
-        errorWidget: (_, __, ___) => const SizedBox.shrink(),
+    return GestureDetector(
+      onTap: () => _showFullscreenImage(context),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: CachedNetworkImage(
+          imageUrl: widget.post.imageUrl!,
+          height: 200,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          memCacheHeight: 400,
+          errorWidget: (_, __, ___) => const SizedBox.shrink(),
+        ),
       ),
     );
   }
@@ -579,10 +653,7 @@ class _PostCardState extends State<PostCard> {
     return Row(
       children: [
         GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => PostDetailScreen(post: post)),
-          ),
+          onTap: () => _goToDetail(context, post),
           child: Row(
             children: [
               Icon(Icons.chat_bubble_outline,
@@ -670,6 +741,35 @@ class _MiniChip extends StatelessWidget {
       child: Text(label,
           style: TextStyle(
               fontSize: 9, color: color, fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
+class _FullscreenImageScreen extends StatelessWidget {
+  final String imageUrl;
+  const _FullscreenImageScreen({required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
+      body: Center(
+        child: InteractiveViewer(
+          minScale: 0.5,
+          maxScale: 4.0,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.contain,
+            errorWidget: (ctx, url, err) =>
+                const Icon(Icons.broken_image, color: Colors.white54, size: 64),
+          ),
+        ),
+      ),
     );
   }
 }
