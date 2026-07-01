@@ -94,6 +94,10 @@ class _HomeShellState extends State<HomeShell> {
               if (i == 3 && unread > 0) {
                 context.read<NotificationProvider>().markAllRead();
               }
+              // Refresh feed with latest scores whenever user taps the home tab
+              if (i == 0) {
+                context.read<FeedProvider>().refresh();
+              }
               setState(() {
                 _visited.add(i);
                 _index = i;

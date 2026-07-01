@@ -16,6 +16,9 @@ class LeaderboardScreen extends StatefulWidget {
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   List<AppUser> _users = [];
+  // Current user's rank when they fall outside the top-N list
+  int? _myRankOutside;
+  AppUser? _myUserOutside;
   bool _loading = true;
   DateTime? _lastRefreshed;
 
@@ -32,21 +35,40 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     final storedTs = prefs.getInt(_prefKey);
     final now = DateTime.now();
 
-    // Auto-refresh once per day
+    // Auto-refresh once per day (skip cache if user not yet in loaded list)
     if (!force && storedTs != null) {
       final lastRefresh = DateTime.fromMillisecondsSinceEpoch(storedTs);
-      if (now.difference(lastRefresh).inHours < 24 && _users.isNotEmpty) {
+      final currentId = SupabaseService.currentUserId;
+      final cachedHasMe = _users.any((u) => u.id == currentId) || _myUserOutside != null;
+      if (now.difference(lastRefresh).inHours < 24 && _users.isNotEmpty && cachedHasMe) {
         return;
       }
     }
 
     setState(() => _loading = true);
     try {
-      final raw = await SupabaseService.getLeaderboard(limit: 50);
+      final currentId = SupabaseService.currentUserId;
+      final results = await Future.wait([
+        SupabaseService.getLeaderboard(limit: 50),
+        SupabaseService.getMyLeaderboardRank(),
+      ]);
+      final raw = results[0] as List<Map<String, dynamic>>;
+      final myRankResult = results[1] as ({int rank, Map<String, dynamic> stats})?;
+
       if (mounted) {
+        final users = raw.map(AppUser.fromMap).toList();
+        final inTopN = users.any((u) => u.id == currentId);
+
         setState(() {
-          _users = raw.map(AppUser.fromMap).toList();
+          _users = users;
           _lastRefreshed = now;
+          if (!inTopN && myRankResult != null) {
+            _myRankOutside = myRankResult.rank;
+            _myUserOutside = AppUser.fromMap(myRankResult.stats);
+          } else {
+            _myRankOutside = null;
+            _myUserOutside = null;
+          }
         });
         await prefs.setInt(_prefKey, now.millisecondsSinceEpoch);
       }
@@ -182,8 +204,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   Widget build(BuildContext context) {
     final currentId = SupabaseService.currentUserId;
     final myIndex = _users.indexWhere((u) => u.id == currentId);
-    final myUser = myIndex >= 0 ? _users[myIndex] : null;
-    final myRank = myIndex >= 0 ? myIndex + 1 : null;
+    // Use in-list rank if present, otherwise use the separately fetched rank
+    final myUser   = myIndex >= 0 ? _users[myIndex] : _myUserOutside;
+    final myRank   = myIndex >= 0 ? myIndex + 1     : _myRankOutside;
 
     return Scaffold(
       backgroundColor: AppTheme.of(context).surface,

@@ -64,7 +64,9 @@ class SupabaseService {
     if (hashtag != null) query = query.contains('hashtags', [hashtag]);
     return await query
         .order('is_pinned', ascending: false)
-        .order('edge_rank', ascending: false)
+        .order('avg_rating', ascending: false)
+        .order('rating_count', ascending: false)
+        .order('created_at', ascending: false)
         .range(offset, offset + limit - 1);
   }
 
@@ -75,7 +77,9 @@ class SupabaseService {
       client
           .from('following_posts_with_meta')
           .select()
-          .order('edge_rank', ascending: false)
+          .order('avg_rating', ascending: false)
+          .order('rating_count', ascending: false)
+          .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
 
   static Future<List<Map<String, dynamic>>> searchPosts(String query) async {
@@ -470,6 +474,23 @@ class SupabaseService {
           .order('user_score', ascending: false)
           .order('id', ascending: true)
           .limit(limit);
+
+  /// Returns the current user's rank (1-based) and their profile_stats row.
+  /// Rank = number of users with strictly higher user_score + 1.
+  static Future<({int rank, Map<String, dynamic> stats})?> getMyLeaderboardRank() async {
+    final uid = currentUserId;
+    if (uid == null) return null;
+    final me = await client.from('profile_stats').select().eq('id', uid).maybeSingle();
+    if (me == null) return null;
+    final myScore = (me['user_score'] as num?)?.toInt() ?? 0;
+    // Count users with strictly higher score
+    final above = await client
+        .from('profile_stats')
+        .select('id')
+        .gt('user_score', myScore);
+    final rank = (above as List).length + 1;
+    return (rank: rank, stats: me);
+  }
 
   // ── User Search ───────────────────────────────────────────────────────────
 
