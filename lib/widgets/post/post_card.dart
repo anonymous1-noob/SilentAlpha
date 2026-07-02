@@ -40,6 +40,8 @@ class _PostCardState extends State<PostCard> {
   bool _dragging = false;
   bool _contentExpanded = false;
   bool _navigating = false;
+  double? _cachedConstraintsWidth;
+  bool? _overflows;
 
   @override
   void initState() {
@@ -52,6 +54,10 @@ class _PostCardState extends State<PostCard> {
     super.didUpdateWidget(old);
     if (!_dragging && widget.post.userRating != old.post.userRating) {
       _slider = (widget.post.userRating ?? 0).toDouble();
+    }
+    if (widget.post.content != old.post.content) {
+      _overflows = null;
+      _cachedConstraintsWidth = null;
     }
   }
 
@@ -97,9 +103,14 @@ class _PostCardState extends State<PostCard> {
   void _showFullscreenImage(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => _FullscreenImageScreen(imageUrl: widget.post.imageUrl!),
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.black,
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (_, __, ___) => _FullscreenImageScreen(
+          imageUrl: widget.post.imageUrl!,
+          heroTag: 'post_image_${widget.post.id}',
+        ),
       ),
     );
   }
@@ -197,62 +208,77 @@ class _PostCardState extends State<PostCard> {
             ? '+${post.avgRating.toStringAsFixed(1)}'
             : post.avgRating.toStringAsFixed(1);
 
-    return GestureDetector(
-      onTap: () {},
-      child: Row(
-        children: [
-          SizedBox(
-            width: 26,
-            child: Text(_emoji(_slider), style: const TextStyle(fontSize: 18)),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                trackHeight: 3,
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
-                overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
-                activeTrackColor: color,
-                inactiveTrackColor: AppTheme.onSurfaceMuted.withValues(alpha: 0.15),
-                thumbColor: color,
-                overlayColor: color.withValues(alpha: 0.15),
-              ),
-              child: Slider(
-                min: -5,
-                max: 5,
-                divisions: 10,
-                value: _slider,
-                onChangeStart: (_) => setState(() => _dragging = true),
-                onChanged: (v) => setState(() => _slider = v),
-                onChangeEnd: (v) {
-                  setState(() => _dragging = false);
-                  feed.ratePost(post.id, v.round());
-                },
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 2),
+          child: Text(
+            widget.post.userRating != null ? 'Your rating' : 'Rate this post',
+            style: TextStyle(
+              fontSize: 10.5,
+              color: AppTheme.of(context).onSurfaceMuted,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(width: 4),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                avgLabel,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: _sliderColor(post.avgRating),
+        ),
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            SizedBox(
+              width: 26,
+              child: Text(_emoji(_slider), style: const TextStyle(fontSize: 18)),
+            ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  trackHeight: 4,
+                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+                  activeTrackColor: color,
+                  inactiveTrackColor: AppTheme.onSurfaceMuted.withValues(alpha: 0.3),
+                  thumbColor: color,
+                  overlayColor: color.withValues(alpha: 0.15),
+                ),
+                child: Slider(
+                  min: -5,
+                  max: 5,
+                  divisions: 10,
+                  value: _slider,
+                  onChangeStart: (_) => setState(() => _dragging = true),
+                  onChanged: (v) => setState(() => _slider = v),
+                  onChangeEnd: (v) {
+                    setState(() => _dragging = false);
+                    feed.ratePost(post.id, v.round());
+                  },
                 ),
               ),
-              if (post.ratingCount > 0)
+            ),
+            const SizedBox(width: 4),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
                 Text(
-                  '${post.ratingCount} rated',
+                  avgLabel,
                   style: TextStyle(
-                      fontSize: 9, color: AppTheme.of(context).onSurfaceMuted),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: _sliderColor(post.avgRating),
+                  ),
                 ),
-            ],
-          ),
-        ],
-      ),
+                if (post.ratingCount > 0)
+                  Text(
+                    '${post.ratingCount} rated',
+                    style: TextStyle(
+                        fontSize: 9, color: AppTheme.of(context).onSurfaceMuted),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -512,15 +538,16 @@ class _PostCardState extends State<PostCard> {
 
     return LayoutBuilder(
       builder: (ctx, constraints) {
-        // TextPainter doesn't support WidgetSpan (used by hashtags), so measure
-        // overflow using plain text. The approximation is close enough for
-        // deciding whether to show "more".
-        final tp = TextPainter(
-          text: TextSpan(text: widget.post.content, style: base),
-          maxLines: collapseLines,
-          textDirection: TextDirection.ltr,
-        )..layout(maxWidth: constraints.maxWidth);
-        final overflows = tp.didExceedMaxLines;
+        if (_cachedConstraintsWidth != constraints.maxWidth) {
+          _cachedConstraintsWidth = constraints.maxWidth;
+          final tp = TextPainter(
+            text: TextSpan(text: widget.post.content, style: base),
+            maxLines: collapseLines,
+            textDirection: TextDirection.ltr,
+          )..layout(maxWidth: constraints.maxWidth);
+          _overflows = tp.didExceedMaxLines;
+        }
+        final overflows = _overflows!;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -628,15 +655,18 @@ class _PostCardState extends State<PostCard> {
   Widget _buildImage() {
     return GestureDetector(
       onTap: () => _showFullscreenImage(context),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: CachedNetworkImage(
-          imageUrl: widget.post.imageUrl!,
-          height: 200,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          memCacheHeight: 400,
-          errorWidget: (_, __, ___) => const SizedBox.shrink(),
+      child: Hero(
+        tag: 'post_image_${widget.post.id}',
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: CachedNetworkImage(
+            imageUrl: widget.post.imageUrl!,
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            memCacheHeight: 400,
+            errorWidget: (_, __, ___) => const SizedBox.shrink(),
+          ),
         ),
       ),
     );
@@ -745,28 +775,125 @@ class _MiniChip extends StatelessWidget {
   }
 }
 
-class _FullscreenImageScreen extends StatelessWidget {
+class _FullscreenImageScreen extends StatefulWidget {
   final String imageUrl;
-  const _FullscreenImageScreen({required this.imageUrl});
+  final String heroTag;
+
+  const _FullscreenImageScreen({required this.imageUrl, required this.heroTag});
+
+  @override
+  State<_FullscreenImageScreen> createState() => _FullscreenImageScreenState();
+}
+
+class _FullscreenImageScreenState extends State<_FullscreenImageScreen>
+    with SingleTickerProviderStateMixin {
+  final _ctrl = TransformationController();
+  late final AnimationController _zoomAnimCtrl;
+  Animation<Matrix4>? _zoomAnim;
+  TapDownDetails? _doubleTapDetails;
+
+  Offset _dragOffset = Offset.zero;
+  double _bgOpacity = 1.0;
+  bool _dismissDragActive = false;
+
+  bool get _isZoomedIn => (_ctrl.value.getMaxScaleOnAxis() - 1.0).abs() > 0.05;
+
+  @override
+  void initState() {
+    super.initState();
+    _zoomAnimCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    )..addListener(() {
+        if (_zoomAnim != null) _ctrl.value = _zoomAnim!.value;
+      });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    _zoomAnimCtrl.dispose();
+    super.dispose();
+  }
+
+  void _handleDoubleTap() {
+    final endMatrix = _isZoomedIn
+        ? Matrix4.identity()
+        : () {
+            final pos = _doubleTapDetails?.localPosition ?? const Offset(0, 0);
+            const scale = 2.5;
+            return Matrix4.identity()
+              ..translateByDouble(-pos.dx * (scale - 1), -pos.dy * (scale - 1), 0, 1)
+              ..scaleByDouble(scale, scale, 1, 1);
+          }();
+
+    _zoomAnim = Matrix4Tween(begin: _ctrl.value, end: endMatrix)
+        .animate(CurvedAnimation(parent: _zoomAnimCtrl, curve: Curves.easeOut));
+    _zoomAnimCtrl.forward(from: 0);
+  }
+
+  void _onVerticalDragStart(DragStartDetails d) {
+    _dismissDragActive = !_isZoomedIn;
+    if (_dismissDragActive) _dragOffset = Offset.zero;
+  }
+
+  void _onVerticalDragUpdate(DragUpdateDetails d) {
+    if (!_dismissDragActive) return;
+    setState(() {
+      _dragOffset += Offset(0, d.delta.dy);
+      _bgOpacity = (1.0 - _dragOffset.dy.abs() / 300.0).clamp(0.0, 1.0);
+    });
+  }
+
+  void _onVerticalDragEnd(DragEndDetails d) {
+    if (!_dismissDragActive) return;
+    _dismissDragActive = false;
+    if (_dragOffset.dy > 100 || d.velocity.pixelsPerSecond.dy > 700) {
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _dragOffset = Offset.zero;
+        _bgOpacity = 1.0;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.black.withValues(alpha: _bgOpacity),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.transparent,
+        iconTheme: IconThemeData(
+          color: Colors.white.withValues(alpha: _bgOpacity),
+        ),
         elevation: 0,
       ),
-      body: Center(
-        child: InteractiveViewer(
-          minScale: 0.5,
-          maxScale: 4.0,
-          child: CachedNetworkImage(
-            imageUrl: imageUrl,
-            fit: BoxFit.contain,
-            errorWidget: (ctx, url, err) =>
-                const Icon(Icons.broken_image, color: Colors.white54, size: 64),
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onDoubleTapDown: (d) => _doubleTapDetails = d,
+        onDoubleTap: _handleDoubleTap,
+        onVerticalDragStart: _onVerticalDragStart,
+        onVerticalDragUpdate: _onVerticalDragUpdate,
+        onVerticalDragEnd: _onVerticalDragEnd,
+        child: Transform.translate(
+          offset: _dragOffset,
+          child: Center(
+            child: InteractiveViewer(
+              transformationController: _ctrl,
+              minScale: 0.5,
+              maxScale: 5.0,
+              child: Hero(
+                tag: widget.heroTag,
+                child: CachedNetworkImage(
+                  imageUrl: widget.imageUrl,
+                  fit: BoxFit.contain,
+                  errorWidget: (_, __, ___) =>
+                      const Icon(Icons.broken_image, color: Colors.white54, size: 64),
+                ),
+              ),
+            ),
           ),
         ),
       ),
