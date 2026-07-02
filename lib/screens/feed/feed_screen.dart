@@ -176,12 +176,14 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
                 child: Center(child: CircularProgressIndicator(color: AppTheme.primary)),
               );
             }
+            final card = PostCard(post: feed.posts[i]);
+            if (i >= 8) return card;
             return AnimationConfiguration.staggeredList(
               position: i,
-              duration: const Duration(milliseconds: 375),
+              duration: const Duration(milliseconds: 300),
               child: SlideAnimation(
-                verticalOffset: 50,
-                child: FadeInAnimation(child: PostCard(post: feed.posts[i])),
+                verticalOffset: 40,
+                child: FadeInAnimation(child: card),
               ),
             );
           },

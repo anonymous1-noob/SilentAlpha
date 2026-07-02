@@ -550,7 +550,7 @@ class _PostsList extends StatelessWidget {
     final list = ListView.builder(
       padding: const EdgeInsets.only(bottom: 80),
       itemCount: posts.length,
-      itemBuilder: (_, i) => PostCard(post: posts[i], compact: true),
+      itemBuilder: (_, i) => PostCard(post: posts[i]),
     );
     if (hasFeed) return list;
     return ChangeNotifierProvider(
@@ -559,3 +559,4 @@ class _PostsList extends StatelessWidget {
     );
   }
 }
+
