@@ -879,16 +879,18 @@ class _FullscreenImageScreenState extends State<_FullscreenImageScreen>
         onVerticalDragEnd: _onVerticalDragEnd,
         child: Transform.translate(
           offset: _dragOffset,
-          child: Center(
-            child: InteractiveViewer(
-              transformationController: _ctrl,
-              minScale: 0.5,
-              maxScale: 5.0,
+          child: InteractiveViewer(
+            transformationController: _ctrl,
+            minScale: 0.5,
+            maxScale: 5.0,
+            child: SizedBox.expand(
               child: Hero(
                 tag: widget.heroTag,
                 child: CachedNetworkImage(
                   imageUrl: widget.imageUrl,
                   fit: BoxFit.contain,
+                  width: double.infinity,
+                  height: double.infinity,
                   errorWidget: (_, __, ___) =>
                       const Icon(Icons.broken_image, color: Colors.white54, size: 64),
                 ),

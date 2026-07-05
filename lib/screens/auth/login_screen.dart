@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     shaderCallback: (b) =>
                         AppTheme.gradient.createShader(b),
                     child: const Text(
-                      'SilentAlpha',
+                      'TheSilentAlpha',
                       style: TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.w900,

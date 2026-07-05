@@ -31,7 +31,7 @@ class HashtagUtils {
       final tag = match.group(0)!;
       spans.add(WidgetSpan(
         child: GestureDetector(
-          onTap: onTap != null ? () => onTap(match.group(1)!) : null,
+          onTap: onTap != null ? () => onTap(normalize(match.group(1)!)) : null,
           child: Text(
             tag,
             style: hashtagStyle ??
