@@ -18,8 +18,8 @@ class _FaqScreenState extends State<FaqScreen> {
       icon: Icons.rocket_launch_outlined,
       items: [
         _Item(
-          q: 'What is Silent Alpha?',
-          a: 'Silent Alpha is a pseudonymous social platform built for finance enthusiasts. '
+          q: 'What is TheSilentAlpha?',
+          a: 'TheSilentAlpha is a pseudonymous social platform built for finance enthusiasts. '
               'Share market insights, post analysis, rate others\' ideas, and climb the leaderboard — '
               'all with the option to post completely anonymously.',
         ),
@@ -29,8 +29,8 @@ class _FaqScreenState extends State<FaqScreen> {
               'Your handle is public; your email is never shown to other users.',
         ),
         _Item(
-          q: 'Is Silent Alpha free?',
-          a: 'Yes — Silent Alpha is completely free to use.',
+          q: 'Is TheSilentAlpha free?',
+          a: 'Yes — TheSilentAlpha is completely free to use.',
         ),
       ],
     ),

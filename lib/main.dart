@@ -52,7 +52,7 @@ class SilentAlphaApp extends StatelessWidget {
       ],
       child: Consumer<ThemeProvider>(
         builder: (_, themeProvider, __) => MaterialApp(
-          title: 'SilentAlpha',
+          title: 'TheSilentAlpha',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,

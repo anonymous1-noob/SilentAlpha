@@ -52,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     try {
       final results = await Future.wait([
         SupabaseService.getProfile(widget.userId),
-        SupabaseService.getPosts(authorId: widget.userId, limit: 50),
+        SupabaseService.getAuthorPosts(widget.userId, limit: 50),
         SupabaseService.getUserLeaderboardRank(widget.userId),
       ]);
       final data = results[0] as Map<String, dynamic>?;

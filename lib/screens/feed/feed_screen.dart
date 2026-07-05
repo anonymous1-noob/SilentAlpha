@@ -58,7 +58,7 @@ class _FeedScreenState extends State<FeedScreen> with SingleTickerProviderStateM
             title: ShaderMask(
               shaderCallback: (b) => AppTheme.gradient.createShader(b),
               child: const Text(
-                'SilentAlpha',
+                'TheSilentAlpha',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 22),
               ),
             ),

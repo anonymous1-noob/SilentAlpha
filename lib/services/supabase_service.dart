@@ -70,6 +70,20 @@ class SupabaseService {
         .range(offset, offset + limit - 1);
   }
 
+  /// Posts for a single author (profile screen) — always newest-first,
+  /// no rating/pin ranking applied.
+  static Future<List<Map<String, dynamic>>> getAuthorPosts(
+    String authorId, {
+    int limit = 50,
+    int offset = 0,
+  }) =>
+      client
+          .from('posts_with_meta')
+          .select()
+          .eq('author_id', authorId)
+          .order('created_at', ascending: false)
+          .range(offset, offset + limit - 1);
+
   static Future<List<Map<String, dynamic>>> getFollowingPosts({
     int limit = 20,
     int offset = 0,
